@@ -74,7 +74,7 @@ export default function TeamsPage() {
         {/* Teams Grid - moved up and wider */}
         <div className="grid md:grid-cols-2 gap-8 mb-8" style={{ marginTop: '-40px' }}>
           {teams.map((team, index) => (
-            <Card key={index} className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl hover:border-white/40 transition-all duration-300" style={{ width: 'calc(100% + 30px)' }}>
+            <Card key={index} className={`bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl hover:border-white/40 transition-all duration-300`} style={{ width: 'calc(100% + 30px)', background: 'none' }}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-2xl font-bold text-white">{team.name}</CardTitle>

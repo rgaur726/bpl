@@ -17,8 +17,7 @@ export default function AdminPage() {
     { name: "Player 3", price: "₹3,20,000" },
     { name: "Player 4", price: "₹1,50,000" },
     { name: "Player 5", price: "₹2,80,000" },
-  ]
-
+  ];
   return (
     <div className="h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
       {/* Animated background */}
@@ -42,10 +41,10 @@ export default function AdminPage() {
         <div className="flex-1 grid grid-cols-12 gap-6">
           {/* Left Side - Player Info */}
           <div className="col-span-5 space-y-4">
-<Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl h-96">
+            <Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl h-96">
               <CardContent className="p-6 h-full flex flex-col">
                 <div className="flex mb-6">
-                  <div className="bg-gradient-to-br from-slate-700 to-slate-800 w-24 h-32 rounded-xl mr-4 flex flex-col items-center justify-center text-white text-xs shadow-lg border border-white/10">
+                  <div className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-lg w-24 h-32 mr-4 flex flex-col items-center justify-center text-white text-xs shadow-lg border border-white/10">
                     <div className="text-center mb-2">Player Photo</div>
                     <div className="text-xs text-purple-400">156 Matches</div>
                   </div>
@@ -110,7 +109,7 @@ export default function AdminPage() {
           {/* Right Side - Teams */}
           <div className="col-span-7 grid grid-cols-2 gap-4">
             {/* Team 1 */}
-            <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl">
+            <Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl">
               <CardContent className="p-4 h-full">
                 <h3 className="text-white text-xl font-bold text-center mb-4 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
                   Thakur XI
@@ -140,7 +139,7 @@ export default function AdminPage() {
             </Card>
 
             {/* Team 2 */}
-<Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl">
+            <Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl">
               <CardContent className="p-4 h-full">
                 <h3 className="text-white text-xl font-bold text-center mb-4 bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
                   Gabbar XI
@@ -172,7 +171,7 @@ export default function AdminPage() {
         </div>
 
         {/* Bottom Section - Player Queue */}
-<Card className="bg-transparent bg-gradient-to-r from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl mt-4 h-24">
+        <Card className="bg-transparent bg-gradient-to-r from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl mt-4 h-24">
           <CardContent className="p-4 h-full">
             <div className="grid grid-cols-8 gap-2 h-12">
               {Array.from({ length: 8 }, (_, i) => (

@@ -62,7 +62,7 @@ export default function HomePage() {
 
           {/* Center - BPL Logo */}
           <div className="flex flex-col items-center space-y-6 mt-[-20px]">
-            <div className="relative flex items-center justify-center">
+            <div className="relative flex items-center justify-center" style={{ marginTop: '-5px' }}>
               <div className="absolute w-80 h-80 rounded-full bg-white opacity-40 blur-2xl"></div>
               <img src="/my-logo.png" alt="BPL Logo" className="w-72 h-72 object-contain relative z-10" />
             </div>
