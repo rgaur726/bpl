@@ -11,6 +11,7 @@ export default function TeamsPage() {
       players: 12,
       budget: "₹50,00,000",
       color: "from-blue-500 to-cyan-500",
+      logo: "/thakur1.png",
     },
     {
       name: "Gabbar XI",
@@ -18,18 +19,18 @@ export default function TeamsPage() {
       players: 12,
       budget: "₹50,00,000",
       color: "from-red-500 to-orange-500",
+      logo: "/gabbar1.png",
     },
   ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Animated background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-1000"></div>
+      {/* BPL Logo only, no background */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+        <img src="/bpl-logo.png" alt="BPL Logo" className="w-40 h-40 z-10" />
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-6">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 pt-2 pb-6">
         {/* Navigation */}
         <nav className="flex justify-between items-center mb-12">
           <div className="flex items-center space-x-2">
@@ -70,17 +71,17 @@ export default function TeamsPage() {
           <p className="text-xl text-gray-300">Current team compositions and budgets</p>
         </div>
 
-        {/* Teams Grid */}
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
+        {/* Teams Grid - moved up and wider */}
+        <div className="grid md:grid-cols-2 gap-8 mb-8" style={{ marginTop: '-40px' }}>
           {teams.map((team, index) => (
-            <Card key={index} className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl hover:border-white/40 transition-all duration-300">
+            <Card key={index} className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl hover:border-white/40 transition-all duration-300" style={{ width: 'calc(100% + 30px)' }}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-2xl font-bold text-white">{team.name}</CardTitle>
                   <div
                     className={`w-12 h-12 rounded-full bg-gradient-to-r ${team.color} flex items-center justify-center`}
                   >
-                    <Users className="h-6 w-6 text-white" />
+                    <img src={team.logo} alt={team.name + " Logo"} className="h-10 w-10 object-contain" />
                   </div>
                 </div>
               </CardHeader>

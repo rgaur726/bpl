@@ -39,12 +39,12 @@ export default function HomePage() {
 
         {/* Main Content */}
         <div className="flex-1 grid grid-cols-3 gap-12 items-center">
-          {/* Thakur XI */}
-          <div className="flex flex-col items-center space-y-6">
+          {/* Thakur XI - move left */}
+          <div className="flex flex-col items-start space-y-6" style={{ marginLeft: '-40px' }}>
             <Card className="group hover:scale-105 transition-all duration-500 bg-transparent bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-md border border-white/20 hover:border-blue-400/50 rounded-3xl shadow-2xl">
               <CardContent className="p-12 text-center">
-                <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-5xl shadow-xl">
-                  🏏
+                <div className="w-40 h-40 mx-auto mb-2 rounded-full flex items-center justify-center text-5xl shadow-xl" style={{ marginTop: '-20px' }}>
+                  <img src="/thakur1.png" alt="Thakur Logo" className="w-36 h-36 object-contain" />
                 </div>
                 <h2 className="text-3xl font-bold text-white mb-2">Thakur XI</h2>
                 <div className="flex items-center justify-center space-x-2 mb-6">
@@ -61,33 +61,31 @@ export default function HomePage() {
           </div>
 
           {/* Center - BPL Logo */}
-          <div className="flex flex-col items-center space-y-6">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-2xl scale-150"></div>
-              <div className="relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 rounded-full p-8 shadow-2xl flex items-center justify-center">
-                <img src="/my-logo.png" alt="Logo" className="w-48 h-48 object-contain" />
-              </div>
+          <div className="flex flex-col items-center space-y-6 mt-[-20px]">
+            <div className="relative flex items-center justify-center">
+              <div className="absolute w-80 h-80 rounded-full bg-white opacity-40 blur-2xl"></div>
+              <img src="/my-logo.png" alt="BPL Logo" className="w-72 h-72 object-contain relative z-10" />
             </div>
-            <div className="text-center">
+            <div className="text-center mt-[-10px]">
                 <h1 className="text-5xl font-bold text-white mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                  Bakchod Premier League
+                  Bhaichara Premier League
                 </h1>
-                <p className="text-xl text-white/60 mb-6">The Ultimate Cricket Auction</p>
-
-                {/* Date, Time, Location */}
+                <p className="text-xl text-white/60 mb-10">Cricket Auction Night</p>
+                {/* Add extra space below subtitle */}
+                <div className="mb-6"></div>
                 <div className="flex justify-center items-center space-x-8 mb-6 text-white/80">
                   <div className="flex items-center space-x-2">
                     <Calendar className="h-5 w-5 text-blue-400" />
                     <div>
-                      <div className="font-semibold">Jan 20, 2025</div>
-                      <div className="text-sm">7:00 PM IST</div>
+                      <div className="font-semibold">July 23, 2025</div>
+                      <div className="text-sm">6:30 PM IST</div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <MapPin className="h-5 w-5 text-blue-400" />
                     <div>
-                      <div className="font-semibold">Mumbai</div>
-                      <div className="text-sm">Cricket Ground</div>
+                      <div className="font-semibold">Bengaluru</div>
+                      <div className="text-sm">Namma Legends</div>
                     </div>
                   </div>
                 </div>
@@ -101,12 +99,12 @@ export default function HomePage() {
               </div>
             </div>
 
-          {/* Gabbar XI */}
-          <div className="flex flex-col items-center space-y-6">
+          {/* Gabbar XI - move right */}
+          <div className="flex flex-col items-end space-y-6" style={{ marginRight: '-40px' }}>
             <Card className="group hover:scale-105 transition-all duration-500 bg-transparent bg-gradient-to-br from-red-500/10 to-orange-500/10 backdrop-blur-md border border-white/20 hover:border-red-400/50 rounded-3xl shadow-2xl">
               <CardContent className="p-12 text-center">
-                <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-red-500 to-orange-400 flex items-center justify-center text-5xl shadow-xl">
-                  🏏
+                <div className="w-40 h-40 mx-auto mb-2 rounded-full flex items-center justify-center text-5xl shadow-xl" style={{ marginTop: '-20px' }}>
+                  <img src="/gabbar1.png" alt="Gabbar Logo" className="w-36 h-36 object-contain" />
                 </div>
                 <h2 className="text-3xl font-bold text-white mb-2">Gabbar XI</h2>
                 <div className="flex items-center justify-center space-x-2 mb-6">
