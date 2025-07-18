@@ -11,17 +11,21 @@ import { Home, Crown } from "lucide-react";
 
 export default function ThakurCaptainPage() {
   const [players, setPlayers] = useState<any[]>([]);
+  const [purses, setPurses] = useState<Record<string, number>>({});
   const { activePlayerIndex, currentBid, setCurrentBid, lastBidder, loading } = useActivePlayerSync();
   const activePlayer = players[activePlayerIndex] || null;
 
   useEffect(() => {
-    async function fetchPlayers() {
+    async function fetchPlayersAndPurses() {
       const { data } = await import("@/lib/supabaseClient").then(
         (mod) => mod.supabase.from("Players").select("*")
       );
       setPlayers(data || []);
+      const { fetchTeamPurses } = await import("@/lib/teamPurse");
+      const purseMap = await fetchTeamPurses();
+      setPurses(purseMap);
     }
-    fetchPlayers();
+    fetchPlayersAndPurses();
   }, []);
 
   // No loading screen; render main UI immediately
@@ -48,48 +52,7 @@ export default function ThakurCaptainPage() {
         <div className="flex-1 grid grid-cols-12 gap-6">
           {/* Left Side - Player Info */}
           <div className="col-span-4 space-y-4">
-            <Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl h-96">
-              <CardContent className="p-6 h-full flex flex-col">
-                <div className="flex mb-6">
-                  <div className="bg-gradient-to-br from-slate-700 to-slate-800 w-24 h-32 rounded-xl mr-4 flex flex-col items-center justify-center text-white text-xs shadow-lg border border-white/10">
-                    <div className="text-center mb-2">Player Photo</div>
-                  </div>
-                  <div className="flex-1 text-white">
-                    <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                      {activePlayer ? activePlayer.Name : "No Active Player"}
-                    </h2>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
-                        <span className="text-blue-400 font-semibold">Matches:</span>
-                        <span>{activePlayer?.Matches ?? "-"}</span>
-                      </div>
-                      <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
-                        <span className="text-blue-400 font-semibold">Batting Innings:</span>
-                        <span>{activePlayer?.batting_innings ?? "-"}</span>
-                      </div>
-                      <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
-                        <span className="text-blue-400 font-semibold">Runs:</span>
-                        <span>{activePlayer?.runs ?? "-"}</span>
-                      </div>
-                      <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
-                        <span className="text-blue-400 font-semibold">Average:</span>
-                        <span>{activePlayer?.average ?? "-"}</span>
-                      </div>
-                      <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
-                        <span className="text-blue-400 font-semibold">Bowling Innings:</span>
-                        <span>{activePlayer?.bowling_innings ?? "-"}</span>
-                      </div>
-                      <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
-                        <span className="text-blue-400 font-semibold">Wickets:</span>
-                        <span>{activePlayer?.wickets ?? "-"}</span>
-                      </div>
-                      <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
-                        <span className="text-blue-400 font-semibold">Economy:</span>
-                        <span>{activePlayer?.economy ?? "-"}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            <PlayerInfoCard activePlayer={activePlayer} lastBidder={lastBidder}>
               <div className="mt-auto space-y-3">
                 <div className="flex gap-3 mb-2">
                   <Button className="bg-gradient-to-r from-orange-500 to-red-500 text-white flex-1 rounded-xl shadow-lg cursor-default">
@@ -97,108 +60,39 @@ export default function ThakurCaptainPage() {
                   </Button>
                 </div>
                 <div className="flex gap-3">
-                  <Button className="bg-gradient-to-r from-blue-500 to-blue-700 text-white flex-1 rounded-xl shadow-lg font-bold" onClick={() => setCurrentBid(currentBid + 100)}>
+                  <Button className="bg-gradient-to-r from-blue-500 to-blue-700 text-white flex-1 rounded-xl shadow-lg font-bold" onClick={() => setCurrentBid(currentBid + 100, 'Thakur')}>
                     + ₹100
                   </Button>
-                  <Button className="bg-gradient-to-r from-purple-500 to-purple-700 text-white flex-1 rounded-xl shadow-lg font-bold" onClick={() => setCurrentBid(currentBid + 500)}>
+                  <Button className="bg-gradient-to-r from-purple-500 to-purple-700 text-white flex-1 rounded-xl shadow-lg font-bold" onClick={() => setCurrentBid(currentBid + 500, 'Thakur')}>
                     + ₹500
                   </Button>
                 </div>
               </div>
-              </CardContent>
-            </Card>
+            </PlayerInfoCard>
           </div>
           {/* Middle - Thakur XI */}
           <div className="col-span-4">
-            <Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl h-[34rem] relative">
-              <CardContent className="p-4 h-full">
-                <h3 className="text-white text-xl font-bold text-center mb-4 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                  <span className="inline-flex items-center justify-center gap-2">
-                    <img
-                      src="/thakur1.png"
-                      alt="Thakur XI Logo"
-                      className="h-6 w-6 inline-block rounded-full border border-blue-400/50 mr-1"
-                    />
-                    Thakur XI
-                  </span>
-                </h3>
-                <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-3 mb-2 rounded-lg border border-white/10">
-                  <div className="grid grid-cols-2 text-sm font-semibold text-white">
-                    <span>Name</span>
-                    <span>Price Sold</span>
-                  </div>
-                </div>
-                <div className="space-y-1 h-80 overflow-y-auto custom-scrollbar">
-                  {Array.from({ length: 12 }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="bg-slate-700/30 backdrop-blur-sm p-2 grid grid-cols-2 text-sm text-white rounded-lg border border-white/5"
-                    >
-                      <span>-</span>
-                      <span>-</span>
-                    </div>
-                  ))}
-                </div>
-                <div
-                  className="bg-gradient-to-r from-slate-900 to-black text-white p-3 text-center rounded-lg border border-white/20"
-                  style={{
-                    position: "absolute",
-                    bottom: "1rem",
-                    left: "1rem",
-                    right: "1rem",
-                  }}
-                >
-                  <div className="font-semibold">Players 0/12</div>
-                  <div className="text-sm text-green-400">Remaining: ₹50,000</div>
-                </div>
-              </CardContent>
-            </Card>
+            <TeamCard
+              team="Thakur XI"
+              logoSrc="/thakur1.png"
+              gradientFrom="slate-800/50"
+              gradientTo="slate-900/50"
+              borderColor="white/20"
+              players={players}
+              purse={purses["Thakur XI"] ?? 0}
+            />
           </div>
           {/* Right - Gabbar XI */}
           <div className="col-span-4">
-            <Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl h-[34rem] relative">
-              <CardContent className="p-4 h-full">
-                <h3 className="text-white text-xl font-bold text-center mb-4 bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
-                  <span className="inline-flex items-center justify-center gap-2">
-                    <img
-                      src="/gabbar1.png"
-                      alt="Gabbar XI Logo"
-                      className="h-6 w-6 inline-block rounded-full border border-orange-400/50 mr-1"
-                    />
-                    Gabbar XI
-                  </span>
-                </h3>
-                <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-3 mb-2 rounded-lg border border-white/10">
-                  <div className="grid grid-cols-2 text-sm font-semibold text-white">
-                    <span>Name</span>
-                    <span>Price Sold</span>
-                  </div>
-                </div>
-                <div className="space-y-1 h-80 overflow-y-auto custom-scrollbar">
-                  {Array.from({ length: 12 }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="bg-slate-700/30 backdrop-blur-sm p-2 grid grid-cols-2 text-sm text-white rounded-lg border border-white/5"
-                    >
-                      <span>-</span>
-                      <span>-</span>
-                    </div>
-                  ))}
-                </div>
-                <div
-                  className="bg-gradient-to-r from-slate-900 to-black text-white p-3 text-center rounded-lg border border-white/20"
-                  style={{
-                    position: "absolute",
-                    bottom: "1rem",
-                    left: "1rem",
-                    right: "1rem",
-                  }}
-                >
-                  <div className="font-semibold">Players 0/12</div>
-                  <div className="text-sm text-green-400">Remaining: ₹50,000</div>
-                </div>
-              </CardContent>
-            </Card>
+            <TeamCard
+              team="Gabbar XI"
+              logoSrc="/gabbar1.png"
+              gradientFrom="slate-800/50"
+              gradientTo="slate-900/50"
+              borderColor="white/20"
+              players={players}
+              purse={purses["Gabbar XI"] ?? 0}
+            />
           </div>
         </div>
       </div>

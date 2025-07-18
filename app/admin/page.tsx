@@ -11,16 +11,20 @@ import { supabase } from "@/lib/supabaseClient"
 
 export default function AdminPage() {
   const [players, setPlayers] = useState<any[]>([])
+  const [purses, setPurses] = useState<Record<string, number>>({});
   const { activePlayerIndex, setActivePlayerIndex, currentBid, lastBidder, loading } = useActivePlayerSync();
   const activePlayer = players[activePlayerIndex] || null;
   // No loading screen; render main UI immediately
 
   useEffect(() => {
-    async function fetchPlayers() {
+    async function fetchPlayersAndPurses() {
       const { data } = await supabase.from("Players").select("*")
       setPlayers(data || [])
+      const { fetchTeamPurses } = await import("@/lib/teamPurse");
+      const purseMap = await fetchTeamPurses();
+      setPurses(purseMap);
     }
-    fetchPlayers()
+    fetchPlayersAndPurses()
   }, [])
 
   return (
@@ -39,7 +43,7 @@ export default function AdminPage() {
         <div className="flex-1 grid grid-cols-12 gap-6">
           {/* Left Side - Player Info */}
           <div className="col-span-4 space-y-4">
-          <PlayerInfoCard activePlayer={activePlayer}>
+          <PlayerInfoCard activePlayer={activePlayer} lastBidder={lastBidder}>
             <div className="mt-auto space-y-3">
               <div className="flex gap-3 mb-2">
                 <Button className="bg-gradient-to-r from-orange-500 to-red-500 text-white flex-1 rounded-xl shadow-lg cursor-default">
@@ -101,6 +105,8 @@ export default function AdminPage() {
               gradientFrom="slate-800/50"
               gradientTo="slate-900/50"
               borderColor="white/20"
+              players={players}
+              purse={purses["Thakur XI"] ?? 0}
             />
           </div>
           {/* Right - Gabbar XI */}
@@ -111,6 +117,8 @@ export default function AdminPage() {
               gradientFrom="slate-800/50"
               gradientTo="slate-900/50"
               borderColor="white/20"
+              players={players}
+              purse={purses["Gabbar XI"] ?? 0}
             />
           </div>
         </div>

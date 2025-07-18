@@ -13,10 +13,13 @@ export interface Player {
   wickets?: number;
   economy?: number;
   sold?: boolean;
+  team?: string;
+  price?: number;
 }
 
 interface PlayerInfoCardProps {
   activePlayer: Player | null;
+  lastBidder?: string;
   children?: React.ReactNode;
 }
 
@@ -26,6 +29,8 @@ interface TeamCardProps {
   gradientFrom: string;
   gradientTo: string;
   borderColor: string;
+  players: Player[];
+  purse: number;
 }
 
 interface RemainingPlayersCardProps {
@@ -33,7 +38,7 @@ interface RemainingPlayersCardProps {
   activePlayerIndex: number;
 }
 
-export function PlayerInfoCard({ activePlayer, children }: PlayerInfoCardProps) {
+export function PlayerInfoCard({ activePlayer, lastBidder, children }: PlayerInfoCardProps) {
   return (
     <Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl h-96">
       <CardContent className="p-6 h-full flex flex-col">
@@ -83,7 +88,8 @@ export function PlayerInfoCard({ activePlayer, children }: PlayerInfoCardProps) 
   );
 }
 
-export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor }: TeamCardProps) {
+export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor, players, purse }: TeamCardProps) {
+  const teamPlayers = players.filter(p => p.sold && p.team === team);
   return (
     <Card className={`bg-transparent bg-gradient-to-br from-${gradientFrom} to-${gradientTo} backdrop-blur-md border border-${borderColor} shadow-2xl h-[34rem] relative`}>
       <CardContent className="p-4 h-full">
@@ -100,16 +106,20 @@ export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor 
           </div>
         </div>
         <div className="space-y-1 h-80 overflow-y-auto custom-scrollbar">
-          {Array.from({ length: 12 }).map((_, index) => (
-            <div key={index} className="bg-slate-700/30 backdrop-blur-sm p-2 grid grid-cols-2 text-sm text-white rounded-lg border border-white/5">
-              <span>-</span>
-              <span>-</span>
-            </div>
-          ))}
+          {teamPlayers.length === 0 ? (
+            <div className="text-white/50 text-center py-8">No players yet</div>
+          ) : (
+            teamPlayers.map((player, index) => (
+              <div key={player.id || index} className="bg-slate-700/30 backdrop-blur-sm p-2 grid grid-cols-2 text-sm text-white rounded-lg border border-white/5">
+                <span>{player.Name}</span>
+                <span>₹{player.price ?? '-'}</span>
+              </div>
+            ))
+          )}
         </div>
         <div className="bg-gradient-to-r from-slate-900 to-black text-white p-3 text-center rounded-lg border border-white/20" style={{ position: "absolute", bottom: "1rem", left: "1rem", right: "1rem" }}>
-          <div className="font-semibold">Players 0/12</div>
-          <div className="text-sm text-green-400">Remaining: ₹50,000</div>
+          <div className="font-semibold">Players {teamPlayers.length}/12</div>
+          <div className="text-sm text-green-400">Remaining: ₹{purse ?? 0}</div>
         </div>
       </CardContent>
     </Card>
@@ -117,6 +127,12 @@ export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor 
 }
 
 export function RemainingPlayersCard({ players, activePlayerIndex }: RemainingPlayersCardProps) {
+  // Only show unsold players, highlight active
+  const unsoldPlayers = players.filter((p) => !p.sold);
+  // Fill up to 24 slots with empty Player objects
+  const gridPlayers = [...unsoldPlayers];
+  const emptyPlayer: Player = { id: undefined, Name: "", sold: false };
+  while (gridPlayers.length < 24) gridPlayers.push(emptyPlayer);
   return (
     <Card className="bg-transparent bg-gradient-to-r from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl w-[90vw]">
       <CardContent className="p-4">
@@ -125,9 +141,9 @@ export function RemainingPlayersCard({ players, activePlayerIndex }: RemainingPl
             <div key={row} className="grid grid-cols-8 gap-2">
               {Array.from({ length: 8 }).map((_, col) => {
                 const idx = row * 8 + col;
-                const player = players[idx];
-                const isActive = idx === activePlayerIndex;
-                const isSold = player && player.sold;
+                const player = gridPlayers[idx];
+                // Mark active player
+                const isActive = player && players.findIndex((p) => p.id === player.id) === activePlayerIndex;
                 return (
                   <div
                     key={player?.id || idx}
@@ -135,9 +151,9 @@ export function RemainingPlayersCard({ players, activePlayerIndex }: RemainingPl
                       isActive
                         ? "text-yellow-400 font-bold ring-2 ring-yellow-400"
                         : "text-white"
-                    } ${isSold ? "opacity-40" : ""}`}
+                    }`}
                   >
-                    {isSold || !player ? "" : player.Name}
+                    {player ? player.Name : ""}
                   </div>
                 );
               })}
