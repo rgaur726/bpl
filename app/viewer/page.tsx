@@ -1,22 +1,35 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
 import { Home, Eye } from "lucide-react"
 
 export default function ViewerPage() {
-  const [currentPlayer] = useState("Virat Kohli")
+  const [players, setPlayers] = useState<any[]>([])
+  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0)
   const [currentBid] = useState("₹3,50,000")
+  const [loading, setLoading] = useState(true)
 
-  const mockPlayers = [
-    { name: "Player 1", price: "₹2,50,000" },
-    { name: "Player 2", price: "₹1,80,000" },
-    { name: "Player 3", price: "₹3,20,000" },
-    { name: "Player 4", price: "₹1,50,000" },
-    { name: "Player 5", price: "₹2,80,000" },
-  ]
+  useEffect(() => {
+    async function fetchPlayers() {
+      const { data } = await import("@/lib/supabaseClient").then(mod => mod.supabase.from("Players").select("*"))
+      setPlayers(data || [])
+      setLoading(false)
+    }
+    fetchPlayers()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <span className="text-white text-xl">Loading...</span>
+      </div>
+    )
+  }
+
+  const currentPlayer = players[currentPlayerIndex] || { Name: "Player", matches: "-" }
 
   return (
     <>
@@ -46,50 +59,57 @@ export default function ViewerPage() {
           <div className="flex-1 grid grid-cols-12 gap-6">
             {/* Left Side - Player Info */}
             <div className="col-span-5 space-y-4">
-              <Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl h-96">
+              <Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl h-[30rem]">
                 <CardContent className="p-6 h-full flex flex-col">
                   <div className="flex mb-6">
                     <div className="bg-gradient-to-br from-slate-700 to-slate-800 w-24 h-32 rounded-xl mr-4 flex flex-col items-center justify-center text-white text-xs shadow-lg border border-white/10">
                       <div className="text-center mb-2">Player Photo</div>
-                      <div className="text-xs text-purple-400">156 Matches</div>
+                      <div className="w-full flex flex-col items-center mt-2">
+                        <Button className="bg-gradient-to-r from-purple-500 to-purple-700 text-white w-full py-1 rounded-lg text-xs font-semibold cursor-default mb-1">
+                          Matches: {currentPlayer.matches ?? "-"}
+                        </Button>
+                        <Button className="bg-gradient-to-r from-blue-500 to-blue-700 text-white w-full py-1 rounded-lg text-xs font-semibold cursor-default">
+                          Base Price: ₹100
+                        </Button>
+                      </div>
                     </div>
                     <div className="flex-1 text-white">
                       <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                        {currentPlayer}
+                        {currentPlayer.Name}
                       </h2>
 
                       {/* Stats List */}
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
                           <span className="text-purple-400 font-semibold">Batting Innings:</span>
-                          <span>45</span>
+                          <span>{currentPlayer.batting_innings ?? "-"}</span>
                         </div>
                         <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
                           <span className="text-purple-400 font-semibold">Runs:</span>
-                          <span>1250</span>
+                          <span>{currentPlayer.runs ?? "-"}</span>
                         </div>
                         <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
                           <span className="text-purple-400 font-semibold">Average:</span>
-                          <span>27.8</span>
+                          <span>{currentPlayer.average ?? "-"}</span>
                         </div>
                         <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
                           <span className="text-purple-400 font-semibold">Bowling Innings:</span>
-                          <span>32</span>
+                          <span>{currentPlayer.bowling_innings ?? "-"}</span>
                         </div>
                         <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
                           <span className="text-purple-400 font-semibold">Wickets:</span>
-                          <span>28</span>
+                          <span>{currentPlayer.wickets ?? "-"}</span>
                         </div>
                         <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
                           <span className="text-purple-400 font-semibold">Economy:</span>
-                          <span>7.2</span>
+                          <span>{currentPlayer.economy ?? "-"}</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Price Display */}
-                  <div className="mt-auto space-y-3">
+                  <div className="mt-auto space-y-3 pb-11">
                     <div className="flex gap-3">
                       <Button className="bg-gradient-to-r from-blue-600 to-blue-700 text-white flex-1 rounded-xl shadow-lg cursor-default">
                         Base: ₹100
@@ -126,14 +146,14 @@ export default function ViewerPage() {
                         key={index}
                         className="bg-slate-700/30 backdrop-blur-sm p-2 grid grid-cols-2 text-sm text-white rounded-lg border border-white/5"
                       >
-                        <span>{mockPlayers[index]?.name || `Player ${index + 1}`}</span>
-                        <span>{mockPlayers[index]?.price || "-"}</span>
+                        <span>{players[index]?.Name || `Player ${index + 1}`}</span>
+                        <span>{players[index]?.price || "-"}</span>
                       </div>
                     ))}
                   </div>
                   <div className="bg-gradient-to-r from-slate-900 to-black text-white p-3 text-center rounded-lg border border-white/20" style={{ position: 'absolute', bottom: '1rem', left: '1rem', right: '1rem' }}>
                     <div className="font-semibold">Players 5/12</div>
-                    <div className="text-sm text-green-400">Remaining: ₹35,00,000</div>
+                    <div className="text-sm text-green-400">Remaining: ₹50,000</div>
                   </div>
                 </CardContent>
               </Card>
@@ -159,14 +179,14 @@ export default function ViewerPage() {
                         key={index}
                         className="bg-slate-700/30 backdrop-blur-sm p-2 grid grid-cols-2 text-sm text-white rounded-lg border border-white/5"
                       >
-                        <span>{mockPlayers[index]?.name || `Player ${index + 1}`}</span>
-                        <span>{mockPlayers[index]?.price || "-"}</span>
+                        <span>{players[index]?.Name || `Player ${index + 1}`}</span>
+                        <span>{players[index]?.price || "-"}</span>
                       </div>
                     ))}
                   </div>
                   <div className="bg-gradient-to-r from-slate-900 to-black text-white p-3 text-center rounded-lg border border-white/20" style={{ position: 'absolute', bottom: '1rem', left: '1rem', right: '1rem' }}>
                     <div className="font-semibold">Players 5/12</div>
-                    <div className="text-sm text-green-400">Remaining: ₹32,00,000</div>
+                    <div className="text-sm text-green-400">Remaining: ₹50,000</div>
                   </div>
                 </CardContent>
               </Card>

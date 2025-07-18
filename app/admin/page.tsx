@@ -40,13 +40,16 @@ export default function AdminPage() {
                 <div className="flex mb-6">
                   <div className="bg-gradient-to-br from-slate-700 to-slate-800 w-24 h-32 rounded-xl mr-4 flex flex-col items-center justify-center text-white text-xs shadow-lg border border-white/10">
                     <div className="text-center mb-2">Player Photo</div>
-                    <div className="text-xs text-purple-400">{activePlayer?.matches ?? '-'}</div>
                   </div>
                   <div className="flex-1 text-white">
                     <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                       {activePlayer ? activePlayer.Name : 'No Active Player'}
                     </h2>
                     <div className="space-y-2 text-sm">
+                      <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
+                        <span className="text-purple-400 font-semibold">Matches:</span>
+                        <span>{activePlayer?.Matches ?? '-'}</span>
+                      </div>
                       <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
                         <span className="text-purple-400 font-semibold">Batting Innings:</span>
                         <span>{activePlayer?.batting_innings ?? '-'}</span>
@@ -83,7 +86,17 @@ export default function AdminPage() {
                   </div>
                   <div className="flex gap-3">
                     <Button className="bg-gradient-to-r from-green-500 to-green-600 text-white flex-1 rounded-xl shadow-lg">Close Bid</Button>
-                    <Button className="bg-gradient-to-r from-blue-600 to-blue-700 text-white flex-1 rounded-xl shadow-lg" onClick={() => setActivePlayerIndex((prev) => (prev + 1) % players.length)}>
+                    <Button
+                      className="bg-gradient-to-r from-blue-600 to-blue-700 text-white flex-1 rounded-xl shadow-lg"
+                      onClick={() => {
+                        if (players.length === 0) return;
+                        let nextIndex = activePlayerIndex;
+                        while (nextIndex === activePlayerIndex && players.length > 1) {
+                          nextIndex = Math.floor(Math.random() * players.length);
+                        }
+                        setActivePlayerIndex(nextIndex);
+                      }}
+                    >
                       Next Player
                     </Button>
                   </div>
@@ -96,7 +109,10 @@ export default function AdminPage() {
             <Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl h-[34rem] relative">
               <CardContent className="p-4 h-full">
                 <h3 className="text-white text-xl font-bold text-center mb-4 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                  Thakur XI
+                  <span className="inline-flex items-center justify-center gap-2">
+                    <img src="/thakur1.png" alt="Thakur XI Logo" className="h-6 w-6 inline-block rounded-full border border-blue-400/50 mr-1" />
+                    Thakur XI
+                  </span>
                 </h3>
                 <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-3 mb-2 rounded-lg border border-white/10">
                   <div className="grid grid-cols-2 text-sm font-semibold text-white">
@@ -117,7 +133,7 @@ export default function AdminPage() {
                 </div>
                 <div className="bg-gradient-to-r from-slate-900 to-black text-white p-3 text-center rounded-lg border border-white/20" style={{ position: 'absolute', bottom: '1rem', left: '1rem', right: '1rem' }}>
                   <div className="font-semibold">Players 0/12</div>
-                  <div className="text-sm text-green-400">Remaining: ₹35,00,000</div>
+                  <div className="text-sm text-green-400">Remaining: ₹50,000</div>
                 </div>
               </CardContent>
             </Card>
@@ -127,7 +143,10 @@ export default function AdminPage() {
             <Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl h-[34rem] relative">
               <CardContent className="p-4 h-full">
                 <h3 className="text-white text-xl font-bold text-center mb-4 bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
-                  Gabbar XI
+                  <span className="inline-flex items-center justify-center gap-2">
+                    <img src="/gabbar1.png" alt="Gabbar XI Logo" className="h-6 w-6 inline-block rounded-full border border-orange-400/50 mr-1" />
+                    Gabbar XI
+                  </span>
                 </h3>
                 <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-3 mb-2 rounded-lg border border-white/10">
                   <div className="grid grid-cols-2 text-sm font-semibold text-white">
@@ -148,26 +167,37 @@ export default function AdminPage() {
                 </div>
                 <div className="bg-gradient-to-r from-slate-900 to-black text-white p-3 text-center rounded-lg border border-white/20" style={{ position: 'absolute', bottom: '1rem', left: '1rem', right: '1rem' }}>
                   <div className="font-semibold">Players 0/12</div>
-                  <div className="text-sm text-green-400">Remaining: ₹32,00,000</div>
+                  <div className="text-sm text-green-400">Remaining: ₹50,000</div>
                 </div>
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
-      {/* Bottom Section - Remaining Players Marquee, fixed at bottom with gap */}
+      {/* Bottom Section - Remaining Players Static Grid */}
       <div className="w-full flex justify-center pb-6 pt-4">
-        <Card className="bg-transparent bg-gradient-to-r from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl h-24 w-[90vw]">
-          <CardContent className="p-4 h-full">
-            <div className="relative h-full overflow-hidden">
-              <div className="absolute inset-0 flex items-center animate-marquee whitespace-nowrap gap-4" style={{ width: '200%' }}>
-                {[...players, ...players].map((player, i) => (
-                  <div key={player.id ? `${player.id}-${i}` : i} className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-lg px-4 py-2 text-white text-xs text-center flex flex-col items-center justify-center border border-white/10 min-w-[120px]">
-                    <div>{player.Name}</div>
-                    <div className="text-xs text-purple-400">Base ₹100</div>
-                  </div>
-                ))}
-              </div>
+        <Card className="bg-transparent bg-gradient-to-r from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl w-[90vw]">
+          <CardContent className="p-4">
+            <div className="grid grid-rows-3 gap-2">
+              {[0, 1, 2].map(row => (
+                <div key={row} className="grid grid-cols-8 gap-2">
+                  {Array.from({ length: 8 }).map((_, col) => {
+                    const idx = row * 8 + col;
+                    const player = players[idx];
+                    // If player is sold, leave slot empty; if active, highlight
+                    const isActive = idx === activePlayerIndex;
+                    const isSold = player && player.sold;
+                    return (
+                      <div
+                        key={player?.id || idx}
+                        className={`bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-lg px-2 py-1 text-sm text-center flex flex-col items-center justify-center border border-white/10 min-w-[90px] h-8 ${isActive ? 'text-yellow-400 font-bold ring-2 ring-yellow-400' : 'text-white'} ${isSold ? 'opacity-40' : ''}`}
+                      >
+                        {isSold || !player ? '' : player.Name}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
