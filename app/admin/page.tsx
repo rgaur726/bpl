@@ -106,7 +106,7 @@ export default function AdminPage() {
               gradientTo="slate-900/50"
               borderColor="white/20"
               players={players}
-              purse={purses["Thakur XI"] ?? 0}
+              purse={purses["Thakur XI"] !== undefined ? purses["Thakur XI"] : 50000}
             />
           </div>
           {/* Right - Gabbar XI */}
@@ -118,7 +118,7 @@ export default function AdminPage() {
               gradientTo="slate-900/50"
               borderColor="white/20"
               players={players}
-              purse={purses["Gabbar XI"] ?? 0}
+              purse={purses["Gabbar XI"] !== undefined ? purses["Gabbar XI"] : 50000}
             />
           </div>
         </div>

@@ -90,6 +90,9 @@ export function PlayerInfoCard({ activePlayer, lastBidder, children }: PlayerInf
 
 export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor, players, purse }: TeamCardProps) {
   const teamPlayers = players.filter(p => p.sold && p.team === team);
+  // Always show 12 slots, fill with placeholders if needed
+  const slots = [...teamPlayers];
+  while (slots.length < 12) slots.push({ id: undefined, Name: "-", price: undefined, sold: false });
   return (
     <Card className={`bg-transparent bg-gradient-to-br from-${gradientFrom} to-${gradientTo} backdrop-blur-md border border-${borderColor} shadow-2xl h-[34rem] relative`}>
       <CardContent className="p-4 h-full">
@@ -106,20 +109,16 @@ export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor,
           </div>
         </div>
         <div className="space-y-1 h-80 overflow-y-auto custom-scrollbar">
-          {teamPlayers.length === 0 ? (
-            <div className="text-white/50 text-center py-8">No players yet</div>
-          ) : (
-            teamPlayers.map((player, index) => (
-              <div key={player.id || index} className="bg-slate-700/30 backdrop-blur-sm p-2 grid grid-cols-2 text-sm text-white rounded-lg border border-white/5">
-                <span>{player.Name}</span>
-                <span>₹{player.price ?? '-'}</span>
-              </div>
-            ))
-          )}
+          {slots.map((player, index) => (
+            <div key={player.id || index} className="bg-slate-700/30 backdrop-blur-sm p-2 grid grid-cols-2 text-sm text-white rounded-lg border border-white/5">
+              <span>{player.Name}</span>
+              <span>{player.price !== undefined ? `₹${player.price}` : '-'}</span>
+            </div>
+          ))}
         </div>
         <div className="bg-gradient-to-r from-slate-900 to-black text-white p-3 text-center rounded-lg border border-white/20" style={{ position: "absolute", bottom: "1rem", left: "1rem", right: "1rem" }}>
           <div className="font-semibold">Players {teamPlayers.length}/12</div>
-          <div className="text-sm text-green-400">Remaining: ₹{purse ?? 0}</div>
+          <div className="text-sm text-green-400">Remaining: ₹{purse !== undefined ? purse : 50000}</div>
         </div>
       </CardContent>
     </Card>

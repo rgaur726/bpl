@@ -76,7 +76,7 @@ export default function GabbarCaptainPage() {
               gradientTo="red-900/30"
               borderColor="red-400/30"
               players={players}
-              purse={purses["Gabbar XI"] ?? 0}
+              purse={purses["Gabbar XI"] !== undefined ? purses["Gabbar XI"] : 50000}
             />
           </div>
           {/* Right - Thakur XI */}
@@ -88,7 +88,7 @@ export default function GabbarCaptainPage() {
               gradientTo="slate-900/50"
               borderColor="white/20"
               players={players}
-              purse={purses["Thakur XI"] ?? 0}
+              purse={purses["Thakur XI"] !== undefined ? purses["Thakur XI"] : 50000}
             />
           </div>
         </div>
