@@ -66,6 +66,14 @@ export default function GabbarCaptainPage() {
                     Current Bid: <span className="text-purple-200">₹{currentBid}</span>
                   </Button>
                 </div>
+                <div className="flex gap-3">
+                  <Button className="bg-gradient-to-r from-blue-500 to-blue-700 text-white flex-1 rounded-xl shadow-lg font-bold" onClick={() => setCurrentBid(currentBid + 100)}>
+                    + ₹100
+                  </Button>
+                  <Button className="bg-gradient-to-r from-purple-500 to-purple-700 text-white flex-1 rounded-xl shadow-lg font-bold" onClick={() => setCurrentBid(currentBid + 500)}>
+                    + ₹500
+                  </Button>
+                </div>
               </div>
             </PlayerInfoCard>
           </div>
