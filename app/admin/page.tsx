@@ -109,10 +109,13 @@ export default function AdminPage() {
           {/* Right Side - Teams */}
           <div className="col-span-7 grid grid-cols-2 gap-4">
             {/* Team 1 */}
-            <Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl">
+            <Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl h-[34rem]">
               <CardContent className="p-4 h-full">
                 <h3 className="text-white text-xl font-bold text-center mb-4 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                  Thakur XI
+                  <span className="inline-flex items-center justify-center gap-2">
+                    <img src="/thakur1.png" alt="Thakur XI Logo" className="h-6 w-6 inline-block rounded-full border border-blue-400/50 mr-1" />
+                    Thakur XI
+                  </span>
                 </h3>
                 <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-3 mb-2 rounded-lg border border-white/10">
                   <div className="grid grid-cols-2 text-sm font-semibold text-white">
@@ -120,29 +123,32 @@ export default function AdminPage() {
                     <span>Price Sold</span>
                   </div>
                 </div>
-                <div className="space-y-1 h-64 overflow-y-auto custom-scrollbar">
-                  {mockPlayers.map((player, index) => (
+                <div className="space-y-1 h-80 overflow-y-auto custom-scrollbar flex flex-col justify-start">
+                  {Array.from({ length: 12 }).map((_, index) => (
                     <div
                       key={index}
                       className="bg-slate-700/30 backdrop-blur-sm p-2 grid grid-cols-2 text-sm text-white rounded-lg border border-white/5"
                     >
-                      <span>{player.name}</span>
-                      <span>{player.price}</span>
+                      <span>{mockPlayers[index]?.name || `Player ${index + 1}`}</span>
+                      <span>{mockPlayers[index]?.price || "-"}</span>
                     </div>
                   ))}
                 </div>
-                <div className="bg-gradient-to-r from-slate-900 to-black text-white p-3 mt-4 text-center rounded-lg border border-white/20">
-                  <div className="font-semibold">Players 5/12</div>
+                <div className="bg-gradient-to-r from-slate-900 to-black text-white p-3 mt-4 text-center rounded-lg border border-white/20" style={{ position: 'absolute', bottom: '1rem', left: '1rem', right: '1rem' }}>
+                  <div className="font-semibold">Players {mockPlayers.length}/12</div>
                   <div className="text-sm text-green-400">Remaining: ₹35,00,000</div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Team 2 */}
-            <Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl">
+            <Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl h-[34rem]">
               <CardContent className="p-4 h-full">
                 <h3 className="text-white text-xl font-bold text-center mb-4 bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
-                  Gabbar XI
+                  <span className="inline-flex items-center justify-center gap-2">
+                    <img src="/gabbar1.png" alt="Gabbar XI Logo" className="h-6 w-6 inline-block rounded-full border border-orange-400/50 mr-1" />
+                    Gabbar XI
+                  </span>
                 </h3>
                 <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-3 mb-2 rounded-lg border border-white/10">
                   <div className="grid grid-cols-2 text-sm font-semibold text-white">
@@ -150,19 +156,19 @@ export default function AdminPage() {
                     <span>Price Sold</span>
                   </div>
                 </div>
-                <div className="space-y-1 h-64 overflow-y-auto custom-scrollbar">
-                  {mockPlayers.map((player, index) => (
+                <div className="space-y-1 h-80 overflow-y-auto custom-scrollbar flex flex-col justify-start">
+                  {Array.from({ length: 12 }).map((_, index) => (
                     <div
                       key={index}
                       className="bg-slate-700/30 backdrop-blur-sm p-2 grid grid-cols-2 text-sm text-white rounded-lg border border-white/5"
                     >
-                      <span>{player.name}</span>
-                      <span>{player.price}</span>
+                      <span>{mockPlayers[index]?.name || `Player ${index + 1}`}</span>
+                      <span>{mockPlayers[index]?.price || "-"}</span>
                     </div>
                   ))}
                 </div>
-                <div className="bg-gradient-to-r from-slate-900 to-black text-white p-3 mt-4 text-center rounded-lg border border-white/20">
-                  <div className="font-semibold">Players 5/12</div>
+                <div className="bg-gradient-to-r from-slate-900 to-black text-white p-3 mt-4 text-center rounded-lg border border-white/20" style={{ position: 'absolute', bottom: '1rem', left: '1rem', right: '1rem' }}>
+                  <div className="font-semibold">Players {mockPlayers.length}/12</div>
                   <div className="text-sm text-green-400">Remaining: ₹32,00,000</div>
                 </div>
               </CardContent>

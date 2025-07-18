@@ -134,10 +134,13 @@ export default function GabbarCaptainPage() {
           {/* Right Side - Teams */}
           <div className="col-span-7 grid grid-cols-2 gap-4">
             {/* My Team */}
-<Card className="bg-transparent bg-gradient-to-br from-red-800/30 to-red-900/30 backdrop-blur-md border border-red-400/30 shadow-2xl">
+<Card className="bg-transparent bg-gradient-to-br from-red-800/30 to-red-900/30 backdrop-blur-md border border-red-400/30 shadow-2xl h-[34rem]">
               <CardContent className="p-4 h-full">
                 <h3 className="text-white text-xl font-bold text-center mb-4 bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
-                  My Team (Gabbar XI)
+                  <span className="inline-flex items-center justify-center gap-2">
+                    <img src="/gabbar1.png" alt="Gabbar XI Logo" className="h-6 w-6 inline-block rounded-full border border-orange-400/50 mr-1" />
+                    My Team (Gabbar XI)
+                  </span>
                 </h3>
                 <div className="bg-gradient-to-r from-red-700 to-red-800 p-3 mb-2 rounded-lg border border-red-400/20">
                   <div className="grid grid-cols-2 text-sm font-semibold text-white">
@@ -145,19 +148,19 @@ export default function GabbarCaptainPage() {
                     <span>Price Sold</span>
                   </div>
                 </div>
-                <div className="space-y-1 h-64 overflow-y-auto custom-scrollbar">
-                  {myTeamPlayers.map((player, index) => (
+                <div className="space-y-1 h-80 overflow-y-auto custom-scrollbar">
+                  {Array.from({ length: 12 }).map((_, index) => (
                     <div
                       key={index}
                       className="bg-red-700/20 backdrop-blur-sm p-2 grid grid-cols-2 text-sm text-white rounded-lg border border-red-400/10"
                     >
-                      <span>{player.name}</span>
-                      <span>{player.price}</span>
+                      <span>{myTeamPlayers[index]?.name || `Player ${index + 1}`}</span>
+                      <span>{myTeamPlayers[index]?.price || "-"}</span>
                     </div>
                   ))}
                 </div>
-                <div className="bg-gradient-to-r from-slate-900 to-black text-white p-3 mt-4 text-center rounded-lg border border-red-400/30">
-                  <div className="font-semibold">Players 4/12</div>
+                <div className="bg-gradient-to-r from-slate-900 to-black text-white p-3 text-center rounded-lg border border-red-400/30" style={{ position: 'absolute', bottom: '1rem', left: '1rem', right: '1rem' }}>
+                  <div className="font-semibold">Players {myTeamPlayers.length}/12</div>
                   <div className="text-sm text-green-400 flex items-center justify-center space-x-1">
                     <DollarSign className="h-3 w-3" />
                     <span>Remaining: ₹41,50,000</span>
@@ -167,10 +170,13 @@ export default function GabbarCaptainPage() {
             </Card>
 
             {/* Opponent Team */}
-<Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl">
+<Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl h-[34rem]">
               <CardContent className="p-4 h-full">
                 <h3 className="text-white text-xl font-bold text-center mb-4 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                  Thakur XI
+                  <span className="inline-flex items-center justify-center gap-2">
+                    <img src="/thakur1.png" alt="Thakur XI Logo" className="h-6 w-6 inline-block rounded-full border border-blue-400/50 mr-1" />
+                    Thakur XI
+                  </span>
                 </h3>
                 <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-3 mb-2 rounded-lg border border-white/10">
                   <div className="grid grid-cols-2 text-sm font-semibold text-white">
@@ -178,19 +184,19 @@ export default function GabbarCaptainPage() {
                     <span>Price Sold</span>
                   </div>
                 </div>
-                <div className="space-y-1 h-64 overflow-y-auto custom-scrollbar">
-                  {opponentPlayers.map((player, index) => (
+                <div className="space-y-1 h-80 overflow-y-auto custom-scrollbar">
+                  {Array.from({ length: 12 }).map((_, index) => (
                     <div
                       key={index}
                       className="bg-slate-700/30 backdrop-blur-sm p-2 grid grid-cols-2 text-sm text-white rounded-lg border border-white/5"
                     >
-                      <span>{player.name}</span>
-                      <span>{player.price}</span>
+                      <span>{opponentPlayers[index]?.name || `Player ${index + 1}`}</span>
+                      <span>{opponentPlayers[index]?.price || "-"}</span>
                     </div>
                   ))}
                 </div>
-                <div className="bg-gradient-to-r from-slate-900 to-black text-white p-3 mt-4 text-center rounded-lg border border-white/20">
-                  <div className="font-semibold">Players 3/12</div>
+                <div className="bg-gradient-to-r from-slate-900 to-black text-white p-3 text-center rounded-lg border border-white/20" style={{ position: 'absolute', bottom: '1rem', left: '1rem', right: '1rem' }}>
+                  <div className="font-semibold">Players {opponentPlayers.length}/12</div>
                   <div className="text-sm text-green-400 flex items-center justify-center space-x-1">
                     <DollarSign className="h-3 w-3" />
                     <span>Remaining: ₹42,50,000</span>
