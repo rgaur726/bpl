@@ -1,22 +1,48 @@
-import { useCallback } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
-// You should set these in your .env.local
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+export function useActivePlayerSync() {
+  const [activePlayerIndex, setActivePlayerIndex] = useState<number>(-1);
+  const [loading, setLoading] = useState(true);
 
-export function useActivePlayer() {
-  // Update the active player index in Supabase
-  const setActivePlayerIndex = useCallback(async (index: number) => {
-    const { error } = await supabase
-      .from("auction_state")
-      .update({ active_player_index: index })
-      .eq("id", 1);
-    if (error) {
-      console.error("Failed to update active player index:", error.message);
-    }
+  useEffect(() => {
+    // Initial fetch
+    const fetchActivePlayer = async () => {
+      const { data, error } = await supabase
+        .from("auction_state")
+        .select("active_player_index")
+        .eq("id", 1)
+        .single();
+      if (data) setActivePlayerIndex(data.active_player_index);
+      setLoading(false);
+    };
+    fetchActivePlayer();
+
+    // Subscribe to changes
+    const subscription = supabase
+      .channel("auction_state_channel")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "auction_state" },
+        (payload) => {
+          setActivePlayerIndex(payload.new.active_player_index);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
   }, []);
 
-  return { setActivePlayerIndex };
+  // Function to update active player index
+  const updateActivePlayerIndex = async (newIndex: number) => {
+    await supabase
+      .from("auction_state")
+      .update({ active_player_index: newIndex })
+      .eq("id", 1);
+    setActivePlayerIndex(newIndex);
+  };
+
+  return { activePlayerIndex, setActivePlayerIndex: updateActivePlayerIndex, loading };
 }

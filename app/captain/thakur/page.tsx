@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useActivePlayerSync } from "@/hooks/useActivePlayer";
 import { Button } from "@/components/ui/button";
 import { PlayerInfoCard, TeamCard, RemainingPlayersCard } from "@/components/auction-cards";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,8 +11,7 @@ import { Home, Crown } from "lucide-react";
 
 export default function ThakurCaptainPage() {
   const [players, setPlayers] = useState<any[]>([]);
-  const [activePlayerIndex, setActivePlayerIndex] = useState<number>(-1);
-  const [loading, setLoading] = useState(false);
+  const { activePlayerIndex, loading } = useActivePlayerSync();
   const [currentBid, setCurrentBid] = useState(0);
   const activePlayer = players[activePlayerIndex] || null;
 

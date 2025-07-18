@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useActivePlayerSync } from "@/hooks/useActivePlayer";
 import { Button } from "@/components/ui/button";
 import { PlayerInfoCard, TeamCard, RemainingPlayersCard } from "@/components/auction-cards";
 import Link from "next/link";
@@ -8,8 +9,8 @@ import { Home, Eye } from "lucide-react";
 
 export default function ViewerPage() {
   const [players, setPlayers] = useState<any[]>([]);
-  const [activePlayerIndex, setActivePlayerIndex] = useState<number>(-1);
-  const [loading, setLoading] = useState(false);
+  const { activePlayerIndex, loading } = useActivePlayerSync();
+  const [currentBid, setCurrentBid] = useState(0);
   const activePlayer = players[activePlayerIndex] || null;
 
   useEffect(() => {
@@ -44,7 +45,15 @@ export default function ViewerPage() {
         <div className="flex-1 grid grid-cols-12 gap-6">
           {/* Left Side - Player Info */}
           <div className="col-span-4 space-y-4">
-            <PlayerInfoCard activePlayer={activePlayer} />
+            <PlayerInfoCard activePlayer={activePlayer}>
+              <div className="mt-auto space-y-3">
+                <div className="flex gap-3 mb-2">
+                  <Button className="bg-gradient-to-r from-orange-500 to-red-500 text-white flex-1 rounded-xl shadow-lg cursor-default">
+                    Current Bid: <span className="text-purple-200">₹{currentBid}</span>
+                  </Button>
+                </div>
+              </div>
+            </PlayerInfoCard>
           </div>
           {/* Middle - Thakur XI */}
           <div className="col-span-4">

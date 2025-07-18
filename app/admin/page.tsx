@@ -2,6 +2,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useActivePlayerSync } from "@/hooks/useActivePlayer";
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { PlayerInfoCard, TeamCard, RemainingPlayersCard } from "@/components/auction-cards";
@@ -10,7 +11,7 @@ import { supabase } from "@/lib/supabaseClient"
 
 export default function AdminPage() {
   const [players, setPlayers] = useState<any[]>([])
-  const [activePlayerIndex, setActivePlayerIndex] = useState<number>(-1)
+  const { activePlayerIndex, setActivePlayerIndex, loading } = useActivePlayerSync();
   const activePlayer = players[activePlayerIndex] || null;
   // No loading screen; render main UI immediately
 

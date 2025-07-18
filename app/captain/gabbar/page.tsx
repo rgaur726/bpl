@@ -7,11 +7,11 @@ import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { Home, Crown, DollarSign, TrendingUp } from "lucide-react"
 import { useEffect, useState } from "react"
+import { useActivePlayerSync } from "@/hooks/useActivePlayer";
 
 export default function GabbarCaptainPage() {
   const [players, setPlayers] = useState<any[]>([]);
-  const [activePlayerIndex, setActivePlayerIndex] = useState<number>(-1);
-  const [loading, setLoading] = useState(false);
+  const { activePlayerIndex, loading } = useActivePlayerSync();
   const [bidAmount, setBidAmount] = useState("");
   const [currentBid, setCurrentBid] = useState(0);
   const activePlayer = players[activePlayerIndex] || null;
