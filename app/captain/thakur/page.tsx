@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { PlayerInfoCard, TeamCard, RemainingPlayersCard } from "@/components/auction-cards";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { Home, Crown } from "lucide-react";
@@ -10,7 +11,7 @@ import { Home, Crown } from "lucide-react";
 export default function ThakurCaptainPage() {
   const [players, setPlayers] = useState<any[]>([]);
   const [activePlayerIndex, setActivePlayerIndex] = useState<number>(-1);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const activePlayer = players[activePlayerIndex] || null;
 
   useEffect(() => {
@@ -19,18 +20,11 @@ export default function ThakurCaptainPage() {
         (mod) => mod.supabase.from("Players").select("*")
       );
       setPlayers(data || []);
-      setLoading(false);
     }
     fetchPlayers();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <span className="text-white text-xl">Loading...</span>
-      </div>
-    );
-  }
+  // No loading screen; render main UI immediately
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-8">
@@ -96,7 +90,13 @@ export default function ThakurCaptainPage() {
                     </div>
                   </div>
                 </div>
-                {/* No bid buttons for captain yet */}
+              <div className="mt-auto space-y-3">
+                <div className="flex gap-3 mb-2">
+                  <Button className="bg-gradient-to-r from-orange-500 to-red-500 text-white flex-1 rounded-xl shadow-lg cursor-default">
+                    Current Bid: <span className="text-purple-200">₹0</span>
+                  </Button>
+                </div>
+              </div>
               </CardContent>
             </Card>
           </div>

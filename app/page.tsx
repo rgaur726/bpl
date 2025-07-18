@@ -29,7 +29,7 @@ export default function HomePage() {
           <div>
             <Link href="/admin">
               <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg backdrop-blur-sm border border-white/10 flex items-center">
-                <Shield className="h-4 w-4 mr-2" />
+                <img src="/admin-logo.png" alt="Admin Logo" className="h-6 w-6 mr-2 rounded-full" style={{ filter: 'invert(1) brightness(2) grayscale(1) drop-shadow(0 0 2px white) drop-shadow(0 0 1px white)' }} />
                 Admin Panel
               </Button>
             </Link>

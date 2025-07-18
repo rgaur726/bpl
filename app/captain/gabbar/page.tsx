@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { PlayerInfoCard, TeamCard, RemainingPlayersCard } from "@/components/auction-cards";
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
@@ -8,14 +9,12 @@ import { Home, Crown, DollarSign, TrendingUp } from "lucide-react"
 import { useEffect, useState } from "react"
 
 export default function GabbarCaptainPage() {
-  const [currentPlayer] = useState("Virat Kohli")
-  const [basePrice] = useState("₹2,00,000")
-  const [currentBid] = useState("₹3,50,000")
-  const [bidAmount, setBidAmount] = useState("")
-
   const [players, setPlayers] = useState<any[]>([]);
   const [activePlayerIndex, setActivePlayerIndex] = useState<number>(-1);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [bidAmount, setBidAmount] = useState("");
+  const [currentBid, setCurrentBid] = useState(0);
+  const activePlayer = players[activePlayerIndex] || null;
 
   const myTeamPlayers = [
     { name: "Player A", price: "₹2,20,000" },
@@ -34,7 +33,6 @@ export default function GabbarCaptainPage() {
     async function fetchPlayers() {
       const { data } = await import("@/lib/supabaseClient").then(mod => mod.supabase.from("Players").select("*"));
       setPlayers(data || []);
-      setLoading(false);
     }
     fetchPlayers();
   }, []);
@@ -61,51 +59,15 @@ export default function GabbarCaptainPage() {
         <div className="flex-1 grid grid-cols-12 gap-6">
           {/* Left Side - Player Info */}
           <div className="col-span-4 space-y-4">
-            <Card className="bg-transparent bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl h-96">
-              <CardContent className="p-6 h-full flex flex-col">
-                <div className="flex mb-6">
-                  <div className="bg-gradient-to-br from-slate-700 to-slate-800 w-24 h-32 rounded-xl mr-4 flex flex-col items-center justify-center text-white text-xs shadow-lg border border-white/10">
-                    <div className="text-center mb-2">Player Photo</div>
-                  </div>
-                  <div className="flex-1 text-white">
-                    <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
-                      {currentPlayer}
-                    </h2>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
-                        <span className="text-red-400 font-semibold">Matches:</span>
-                        <span>156</span>
-                      </div>
-                      <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
-                        <span className="text-red-400 font-semibold">Batting Innings:</span>
-                        <span>45</span>
-                      </div>
-                      <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
-                        <span className="text-red-400 font-semibold">Runs:</span>
-                        <span>1250</span>
-                      </div>
-                      <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
-                        <span className="text-red-400 font-semibold">Average:</span>
-                        <span>27.8</span>
-                      </div>
-                      <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
-                        <span className="text-red-400 font-semibold">Bowling Innings:</span>
-                        <span>32</span>
-                      </div>
-                      <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
-                        <span className="text-red-400 font-semibold">Wickets:</span>
-                        <span>28</span>
-                      </div>
-                      <div className="flex justify-between items-center bg-slate-700/30 p-2 rounded-lg">
-                        <span className="text-red-400 font-semibold">Economy:</span>
-                        <span>7.2</span>
-                      </div>
-                    </div>
-                  </div>
+            <PlayerInfoCard activePlayer={activePlayer}>
+              <div className="mt-auto space-y-3">
+                <div className="flex gap-3 mb-2">
+                  <Button className="bg-gradient-to-r from-orange-500 to-red-500 text-white flex-1 rounded-xl shadow-lg cursor-default">
+                    Current Bid: <span className="text-purple-200">₹{currentBid}</span>
+                  </Button>
                 </div>
-                {/* No bid buttons for captain */}
-              </CardContent>
-            </Card>
+              </div>
+            </PlayerInfoCard>
           </div>
           {/* Middle - My Team */}
           <div className="col-span-4">
