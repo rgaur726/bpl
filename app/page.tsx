@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { BPLLogo } from "@/components/bpl-logo"
-import Link from "next/link"
-import { Calendar, MapPin, Shield, Crown, Home as HomeIcon } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { BPLLogo } from "@/components/bpl-logo";
+import Link from "next/link";
+import { Calendar, MapPin, Shield, Crown, Home as HomeIcon } from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -15,7 +15,6 @@ export default function HomePage() {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
-
       <div className="relative z-10 max-w-7xl mx-auto h-full flex flex-col p-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-12 w-full">
@@ -36,14 +35,13 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-
         {/* Main Content */}
         <div className="flex-1 grid grid-cols-3 gap-12 items-center">
           {/* Thakur XI - move left */}
-          <div className="flex flex-col items-start space-y-6" style={{ marginLeft: '-40px' }}>
+          <div className="flex flex-col items-start space-y-6" style={{ marginLeft: "-40px" }}>
             <Card className="group hover:scale-105 transition-all duration-500 bg-transparent bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-md border border-white/20 hover:border-blue-400/50 rounded-3xl shadow-2xl">
               <CardContent className="p-12 text-center">
-                <div className="w-40 h-40 mx-auto mb-2 rounded-full flex items-center justify-center text-5xl shadow-xl" style={{ marginTop: '-20px' }}>
+                <div className="w-40 h-40 mx-auto mb-2 rounded-full flex items-center justify-center text-5xl shadow-xl" style={{ marginTop: "-20px" }}>
                   <img src="/thakur1.png" alt="Thakur Logo" className="w-36 h-36 object-contain" />
                 </div>
                 <h2 className="text-3xl font-bold text-white mb-2">Thakur XI</h2>
@@ -59,51 +57,50 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </div>
-
           {/* Center - BPL Logo */}
           <div className="flex flex-col items-center space-y-6 mt-[-20px]">
-            <div className="relative flex items-center justify-center" style={{ marginTop: '-5px' }}>
+            <div className="relative flex items-center justify-center" style={{ marginTop: "-5px" }}>
               <div className="absolute w-80 h-80 rounded-full bg-white opacity-40 blur-2xl"></div>
               <img src="/my-logo.png" alt="BPL Logo" className="w-72 h-72 object-contain relative z-10" />
             </div>
             <div className="text-center mt-[-10px]">
-                <h1 className="text-5xl font-bold text-white mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                  Bhaichara Premier League
-                </h1>
-                <p className="text-xl text-white/60 mb-10">Cricket Auction Night</p>
-                {/* Add extra space below subtitle */}
-                <div className="mb-6"></div>
-                <div className="flex justify-center items-center space-x-8 mb-6 text-white/80">
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="h-5 w-5 text-blue-400" />
-                    <div>
-                      <div className="font-semibold">July 23, 2025</div>
-                      <div className="text-sm">6:30 PM IST</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <MapPin className="h-5 w-5 text-blue-400" />
-                    <div>
-                      <div className="font-semibold">Bengaluru</div>
-                      <div className="text-sm">Namma Legends</div>
-                    </div>
+              <h1 className="text-5xl font-bold text-white mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                Bhaichara Premier League
+              </h1>
+              <p className="text-xl text-white/60 mb-10">Cricket Auction Night</p>
+              {/* Add extra space below subtitle */}
+              <div className="mb-6"></div>
+              <div className="flex justify-center items-center space-x-8 mb-6 text-white/80">
+                <div className="flex items-center space-x-2">
+                  <Calendar className="h-5 w-5 text-blue-400" />
+                  <div>
+                    <div className="font-semibold">July 23, 2025</div>
+                    <div className="text-sm">6:30 PM IST</div>
                   </div>
                 </div>
-
-                {/* Cricket placeholder image removed */}
-                <Link href="/viewer">
-                  <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-24 py-7 rounded-2xl text-2xl font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 mb-8">
-                    Watch Live Auction
-                  </Button>
-                </Link>
+                <div className="flex items-center space-x-2">
+                  <MapPin className="h-5 w-5 text-blue-400" />
+                  <div>
+                    <div className="font-semibold">Bengaluru</div>
+                    <div className="text-sm">Namma Legends</div>
+                  </div>
+                </div>
               </div>
+
+              {/* Cricket placeholder image removed */}
+              <Link href="/viewer">
+                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-24 py-7 rounded-2xl text-2xl font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 mb-8">
+                  Watch Live Auction
+                </Button>
+              </Link>
             </div>
+          </div>
 
           {/* Gabbar XI - move right */}
-          <div className="flex flex-col items-end space-y-6" style={{ marginRight: '-40px' }}>
+          <div className="flex flex-col items-end space-y-6" style={{ marginRight: "-40px" }}>
             <Card className="group hover:scale-105 transition-all duration-500 bg-transparent bg-gradient-to-br from-red-500/10 to-orange-500/10 backdrop-blur-md border border-white/20 hover:border-red-400/50 rounded-3xl shadow-2xl">
               <CardContent className="p-12 text-center">
-                <div className="w-40 h-40 mx-auto mb-2 rounded-full flex items-center justify-center text-5xl shadow-xl" style={{ marginTop: '-20px' }}>
+                <div className="w-40 h-40 mx-auto mb-2 rounded-full flex items-center justify-center text-5xl shadow-xl" style={{ marginTop: "-20px" }}>
                   <img src="/gabbar1.png" alt="Gabbar Logo" className="w-36 h-36 object-contain" />
                 </div>
                 <h2 className="text-3xl font-bold text-white mb-2">Gabbar XI</h2>
@@ -122,5 +119,5 @@ export default function HomePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
