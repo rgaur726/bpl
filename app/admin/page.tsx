@@ -11,7 +11,7 @@ import { supabase } from "@/lib/supabaseClient"
 
 export default function AdminPage() {
   const [players, setPlayers] = useState<any[]>([])
-  const { activePlayerIndex, setActivePlayerIndex, loading } = useActivePlayerSync();
+  const { activePlayerIndex, setActivePlayerIndex, currentBid, lastBidder, loading } = useActivePlayerSync();
   const activePlayer = players[activePlayerIndex] || null;
   // No loading screen; render main UI immediately
 
@@ -43,11 +43,39 @@ export default function AdminPage() {
             <div className="mt-auto space-y-3">
               <div className="flex gap-3 mb-2">
                 <Button className="bg-gradient-to-r from-orange-500 to-red-500 text-white flex-1 rounded-xl shadow-lg cursor-default">
-                  Current Bid: <span className="text-purple-200">₹0</span>
+                  Current Bid: <span className="text-purple-200">₹{currentBid}</span> {lastBidder === 'Thakur' ? '(Thakur)' : lastBidder === 'Gabbar' ? '(Gabbar)' : ''}
                 </Button>
               </div>
               <div className="flex gap-3">
-                <Button className="bg-gradient-to-r from-green-500 to-green-600 text-white flex-1 rounded-xl shadow-lg">Close Bid</Button>
+                <Button
+                  className="bg-gradient-to-r from-green-500 to-green-600 text-white flex-1 rounded-xl shadow-lg"
+                  onClick={async () => {
+                    if (!activePlayer || !lastBidder || !currentBid) return;
+                    // 1. Mark player as sold and assign team
+                    await supabase
+                      .from("Players")
+                      .update({ sold: true, team: lastBidder })
+                      .eq("id", activePlayer.id);
+                    // 2. Subtract bid from team's purse
+                    const teamName = lastBidder === 'Thakur' ? 'Thakur XI' : 'Gabbar XI';
+                    // Get current purse
+                    const { data: teamData } = await supabase
+                      .from("teams")
+                      .select("purse")
+                      .eq("name", teamName)
+                      .single();
+                    const newPurse = (teamData?.purse ?? 0) - currentBid;
+                    await supabase
+                      .from("teams")
+                      .update({ purse: newPurse })
+                      .eq("name", teamName);
+                    // 3. Refresh players
+                    const { data } = await supabase.from("Players").select("*");
+                    setPlayers(data || []);
+                  }}
+                >
+                  Close Bid
+                </Button>
                 <Button
                   className="bg-gradient-to-r from-blue-600 to-blue-700 text-white flex-1 rounded-xl shadow-lg"
                   onClick={() => {

@@ -9,8 +9,7 @@ import { Home, Eye } from "lucide-react";
 
 export default function ViewerPage() {
   const [players, setPlayers] = useState<any[]>([]);
-  const { activePlayerIndex, loading } = useActivePlayerSync();
-  const [currentBid, setCurrentBid] = useState(0);
+  const { activePlayerIndex, currentBid, lastBidder, loading } = useActivePlayerSync();
   const activePlayer = players[activePlayerIndex] || null;
 
   useEffect(() => {
@@ -49,7 +48,7 @@ export default function ViewerPage() {
               <div className="mt-auto space-y-3">
                 <div className="flex gap-3 mb-2">
                   <Button className="bg-gradient-to-r from-orange-500 to-red-500 text-white flex-1 rounded-xl shadow-lg cursor-default">
-                    Current Bid: <span className="text-purple-200">₹{currentBid}</span>
+                    Current Bid: <span className="text-purple-200">₹{currentBid}</span> {lastBidder === 'Thakur' ? '(Thakur)' : lastBidder === 'Gabbar' ? '(Gabbar)' : ''}
                   </Button>
                 </div>
               </div>

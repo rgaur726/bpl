@@ -11,9 +11,8 @@ import { useActivePlayerSync } from "@/hooks/useActivePlayer";
 
 export default function GabbarCaptainPage() {
   const [players, setPlayers] = useState<any[]>([]);
-  const { activePlayerIndex, loading } = useActivePlayerSync();
+  const { activePlayerIndex, currentBid, setCurrentBid, lastBidder, loading } = useActivePlayerSync();
   const [bidAmount, setBidAmount] = useState("");
-  const [currentBid, setCurrentBid] = useState(0);
   const activePlayer = players[activePlayerIndex] || null;
 
   const myTeamPlayers = [
@@ -63,14 +62,14 @@ export default function GabbarCaptainPage() {
               <div className="mt-auto space-y-3">
                 <div className="flex gap-3 mb-2">
                   <Button className="bg-gradient-to-r from-orange-500 to-red-500 text-white flex-1 rounded-xl shadow-lg cursor-default">
-                    Current Bid: <span className="text-purple-200">₹{currentBid}</span>
+                    Current Bid: <span className="text-purple-200">₹{currentBid}</span> {lastBidder === 'Thakur' ? '(Thakur)' : lastBidder === 'Gabbar' ? '(Gabbar)' : ''}
                   </Button>
                 </div>
                 <div className="flex gap-3">
-                  <Button className="bg-gradient-to-r from-blue-500 to-blue-700 text-white flex-1 rounded-xl shadow-lg font-bold" onClick={() => setCurrentBid(currentBid + 100)}>
+                  <Button className="bg-gradient-to-r from-blue-500 to-blue-700 text-white flex-1 rounded-xl shadow-lg font-bold" onClick={() => setCurrentBid(currentBid + 100, 'Gabbar')}>
                     + ₹100
                   </Button>
-                  <Button className="bg-gradient-to-r from-purple-500 to-purple-700 text-white flex-1 rounded-xl shadow-lg font-bold" onClick={() => setCurrentBid(currentBid + 500)}>
+                  <Button className="bg-gradient-to-r from-purple-500 to-purple-700 text-white flex-1 rounded-xl shadow-lg font-bold" onClick={() => setCurrentBid(currentBid + 500, 'Gabbar')}>
                     + ₹500
                   </Button>
                 </div>
