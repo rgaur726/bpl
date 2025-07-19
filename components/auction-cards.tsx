@@ -141,15 +141,12 @@ export function RemainingPlayersCard({ players, activePlayerIndex }: RemainingPl
               {Array.from({ length: 8 }).map((_, col) => {
                 const idx = row * 8 + col;
                 const player = gridPlayers[idx];
-                // Mark active player
-                const isActive = player && players.findIndex((p) => p.id === player.id) === activePlayerIndex;
+                const isActive = idx === activePlayerIndex;
                 return (
                   <div
                     key={player?.id || idx}
-                    className={`bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-lg px-2 py-1 text-sm text-center flex flex-col items-center justify-center border border-white/10 min-w-[90px] h-8 ${
-                      isActive
-                        ? "text-yellow-400 font-bold ring-2 ring-yellow-400"
-                        : "text-white"
+                    className={`bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-lg px-2 py-1 text-sm text-center flex flex-col items-center justify-center border border-white/10 min-w-[90px] h-8${
+                      isActive ? ' text-yellow-400 font-bold ring-2 ring-yellow-400' : ' text-white'
                     }`}
                   >
                     {player ? player.Name : ""}
