@@ -139,18 +139,18 @@ export default function ThakurCaptainPage() {
                 </div>
                 <div className="flex gap-3">
                                   <Button
-                  className={`${(teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + 100) ? 'bg-gradient-to-r from-gray-500 to-gray-600' : 'bg-gradient-to-r from-blue-500 to-blue-700'} text-white flex-1 rounded-xl shadow-lg font-bold`}
-                  onClick={() => setCurrentBid(currentBid + 100, 'Thakur XI')}
-                  disabled={!activePlayer || (teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + 100)}
+                  className={`${(teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + (currentBid < 5000 ? 100 : 500)) ? 'bg-gradient-to-r from-gray-500 to-gray-600' : 'bg-gradient-to-r from-blue-500 to-blue-700'} text-white flex-1 rounded-xl shadow-lg font-bold`}
+                  onClick={() => setCurrentBid(currentBid + (currentBid < 5000 ? 100 : 500), 'Thakur XI')}
+                  disabled={!activePlayer || (teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + (currentBid < 5000 ? 100 : 500)) || ((teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) - currentBid) < (currentBid < 5000 ? 100 : 500)}
                 >
-                  {(teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + 100) ? '₹100 (Insufficient)' : '+ ₹100'}
+                  {((teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + (currentBid < 5000 ? 100 : 500)) || ((teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) - currentBid) < (currentBid < 5000 ? 100 : 500)) ? `₹${currentBid < 5000 ? 100 : 500} (Insufficient)` : `+ ₹${currentBid < 5000 ? 100 : 500}`}
                 </Button>
                 <Button
-                  className={`${(teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + 500) ? 'bg-gradient-to-r from-gray-500 to-gray-600' : 'bg-gradient-to-r from-purple-500 to-purple-700'} text-white flex-1 rounded-xl shadow-lg font-bold`}
-                  onClick={() => setCurrentBid(currentBid + 500, 'Thakur XI')}
-                  disabled={!activePlayer || (teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + 500)}
+                  className={`${(teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + (currentBid < 5000 ? 500 : 1000)) ? 'bg-gradient-to-r from-gray-500 to-gray-600' : 'bg-gradient-to-r from-purple-500 to-purple-700'} text-white flex-1 rounded-xl shadow-lg font-bold`}
+                  onClick={() => setCurrentBid(currentBid + (currentBid < 5000 ? 500 : 1000), 'Thakur XI')}
+                  disabled={!activePlayer || (teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + (currentBid < 5000 ? 500 : 1000)) || ((teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) - currentBid) < (currentBid < 5000 ? 500 : 1000)}
                 >
-                  {(teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + 500) ? '₹500 (Insufficient)' : '+ ₹500'}
+                  {((teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + (currentBid < 5000 ? 500 : 1000)) || ((teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) - currentBid) < (currentBid < 5000 ? 500 : 1000)) ? `₹${currentBid < 5000 ? 500 : 1000} (Insufficient)` : `+ ₹${currentBid < 5000 ? 500 : 1000}`}
                 </Button>
                 </div>
               </div>
