@@ -213,7 +213,8 @@ export default function AdminPage() {
                     setPlayers(refreshedPlayers || []);
                     
                     // Broadcast the player sale to other pages
-                    const broadcastChannel = supabase.channel('player_sold_broadcast');
+                    const broadcastChannel = supabase.channel('player_updates_broadcast');
+                    await broadcastChannel.subscribe();
                     await broadcastChannel.send({
                       type: 'broadcast',
                       event: 'player_sold',
@@ -223,9 +224,10 @@ export default function AdminPage() {
                         amount: currentBid 
                       }
                     });
+                    await supabase.removeChannel(broadcastChannel);
                   }}
                 >
-                  Close Bid
+                  Sell Player
                 </Button>
                 <Button
                   className="bg-gradient-to-r from-blue-600 to-blue-700 text-white flex-1 rounded-xl shadow-lg"
@@ -242,7 +244,38 @@ export default function AdminPage() {
                     const randomIdx = Math.floor(Math.random() * unsoldPlayers.length);
                     const randomPlayer = unsoldPlayers[randomIdx];
                     const newIndex = players.findIndex(p => p.player_id === randomPlayer.player_id);
+                    
+                    // Update auction_state table with new player and reset bid
+                    const auctionUpdate = await supabase
+                      .from("auction_state")
+                      .update({ 
+                        active_player_index: newIndex,
+                        current_bid: 0,
+                        last_bidder: null
+                      })
+                      .eq("id", 1);
+                    
+                    if (auctionUpdate.error) {
+                      console.error('Auction state update error:', auctionUpdate.error);
+                      alert('Error updating auction state: ' + auctionUpdate.error.message);
+                      return;
+                    }
+                    
                     setActivePlayerIndex(newIndex);
+                    
+                    // Broadcast the next player event to all pages
+                    const broadcastChannel = supabase.channel('player_updates_broadcast');
+                    await broadcastChannel.subscribe();
+                    await broadcastChannel.send({
+                      type: 'broadcast',
+                      event: 'next_player',
+                      payload: { 
+                        playerId: randomPlayer.player_id,
+                        playerIndex: newIndex,
+                        playerName: randomPlayer.player_name
+                      }
+                    });
+                    await supabase.removeChannel(broadcastChannel);
                   }}
                 >
                   Next Player
@@ -251,7 +284,7 @@ export default function AdminPage() {
               <div className="flex gap-3">
                 <Button
                   className="bg-gradient-to-r from-yellow-600 to-yellow-700 text-white flex-1 rounded-xl shadow-lg"
-                  disabled={!activePlayer}
+                  disabled={!activePlayer || currentBid === 0}
                   onClick={async () => {
                     if (confirm('Reset the current bid to 0? This will clear the current bid and last bidder.')) {
                       try {

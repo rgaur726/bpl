@@ -54,12 +54,46 @@ export function useActivePlayerSync() {
 
   // Function to update current bid and last bidder
   const updateCurrentBid = async (newBid: number, bidder: string) => {
+    // Get team's current purse to validate bid
+    const { data: teamData, error: teamError } = await supabase
+      .from("teams")
+      .select("purse")
+      .eq("team_name", bidder)
+      .single();
+
+    if (teamError) {
+      console.error('Error fetching team purse:', teamError);
+      alert('Error checking team purse. Please try again.');
+      return;
+    }
+
+    const currentPurse = teamData?.purse ?? 50000;
+    
+    // Validate that the new bid doesn't exceed team's purse
+    if (newBid > currentPurse) {
+      alert(`Insufficient funds! ${bidder} has only ₹${currentPurse} remaining. Cannot bid ₹${newBid}.`);
+      return;
+    }
+
     await supabase
       .from("auction_state")
       .update({ current_bid: newBid, last_bidder: bidder })
       .eq("id", 1);
     setCurrentBid(newBid);
     setLastBidder(bidder);
+    
+    // Broadcast the bid update to all pages
+    const broadcastChannel = supabase.channel('player_updates_broadcast');
+    await broadcastChannel.subscribe();
+    await broadcastChannel.send({
+      type: 'broadcast',
+      event: 'bid_update',
+      payload: { 
+        newBid: newBid,
+        bidder: bidder
+      }
+    });
+    await supabase.removeChannel(broadcastChannel);
   };
 
   return { activePlayerIndex, setActivePlayerIndex: updateActivePlayerIndex, currentBid, setCurrentBid: updateCurrentBid, lastBidder, loading };

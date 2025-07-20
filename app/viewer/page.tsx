@@ -66,9 +66,17 @@ export default function ViewerPage() {
 
       // Also listen for broadcast messages from admin
       const broadcastSubscription = supabase
-        .channel('player_sold_broadcast_viewer')
+        .channel('player_updates_broadcast_viewer')
         .on('broadcast', { event: 'player_sold' }, async (payload) => {
-          console.log("Viewer page - Received broadcast:", payload);
+          console.log("Viewer page - Received player_sold broadcast:", payload);
+          await fetchPlayersAndPurses();
+        })
+        .on('broadcast', { event: 'next_player' }, async (payload) => {
+          console.log("Viewer page - Received next_player broadcast:", payload);
+          await fetchPlayersAndPurses();
+        })
+        .on('broadcast', { event: 'bid_update' }, async (payload) => {
+          console.log("Viewer page - Received bid_update broadcast:", payload);
           await fetchPlayersAndPurses();
         })
         .subscribe();

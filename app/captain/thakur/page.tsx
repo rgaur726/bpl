@@ -63,9 +63,17 @@ export default function ThakurCaptainPage() {
 
       // Also listen for broadcast messages from admin
       const broadcastSubscription = supabase
-        .channel('player_sold_broadcast_thakur')
+        .channel('player_updates_broadcast_thakur')
         .on('broadcast', { event: 'player_sold' }, async (payload) => {
-          console.log("Thakur page - Received broadcast:", payload);
+          console.log("Thakur page - Received player_sold broadcast:", payload);
+          await fetchPlayersAndPurses();
+        })
+        .on('broadcast', { event: 'next_player' }, async (payload) => {
+          console.log("Thakur page - Received next_player broadcast:", payload);
+          await fetchPlayersAndPurses();
+        })
+        .on('broadcast', { event: 'bid_update' }, async (payload) => {
+          console.log("Thakur page - Received bid_update broadcast:", payload);
           await fetchPlayersAndPurses();
         })
         .subscribe();
@@ -124,20 +132,25 @@ export default function ThakurCaptainPage() {
                     Current Bid: <span className="text-purple-200">₹{currentBid}</span> {lastBidder === 'Thakur XI' ? '(Thakur XI)' : lastBidder === 'Gabbar XI' ? '(Gabbar XI)' : ''}
                   </Button>
                 </div>
+                <div className="flex gap-3 mb-2">
+                  <Button className="bg-gradient-to-r from-green-600 to-green-700 text-white flex-1 rounded-xl shadow-lg cursor-default">
+                    Your Purse: <span className="text-green-200">₹{teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000}</span>
+                  </Button>
+                </div>
                 <div className="flex gap-3">
                                   <Button
-                  className="bg-gradient-to-r from-blue-500 to-blue-700 text-white flex-1 rounded-xl shadow-lg font-bold"
+                  className={`${(teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + 100) ? 'bg-gradient-to-r from-gray-500 to-gray-600' : 'bg-gradient-to-r from-blue-500 to-blue-700'} text-white flex-1 rounded-xl shadow-lg font-bold`}
                   onClick={() => setCurrentBid(currentBid + 100, 'Thakur XI')}
-                  disabled={!activePlayer}
+                  disabled={!activePlayer || (teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + 100)}
                 >
-                  + ₹100
+                  {(teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + 100) ? '₹100 (Insufficient)' : '+ ₹100'}
                 </Button>
                 <Button
-                  className="bg-gradient-to-r from-purple-500 to-purple-700 text-white flex-1 rounded-xl shadow-lg font-bold"
+                  className={`${(teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + 500) ? 'bg-gradient-to-r from-gray-500 to-gray-600' : 'bg-gradient-to-r from-purple-500 to-purple-700'} text-white flex-1 rounded-xl shadow-lg font-bold`}
                   onClick={() => setCurrentBid(currentBid + 500, 'Thakur XI')}
-                  disabled={!activePlayer}
+                  disabled={!activePlayer || (teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + 500)}
                 >
-                  + ₹500
+                  {(teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000) < (currentBid + 500) ? '₹500 (Insufficient)' : '+ ₹500'}
                 </Button>
                 </div>
               </div>
