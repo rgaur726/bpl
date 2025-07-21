@@ -133,7 +133,7 @@ export default function GabbarCaptainPage() {
             </h1>
           </div>
         </div>
-        {/* Main Content: Player Info, My Team, Thakur XI */}
+        {/* Main Content: Player Info, Gabbar XI, Thakur XI */}
         <div className="flex-1 grid grid-cols-12 gap-6">
           {/* Left Side - Player Info */}
           <div className="col-span-4 space-y-4">
@@ -179,6 +179,7 @@ export default function GabbarCaptainPage() {
               players={players}
               purse={teams["Gabbar XI"]?.purse !== undefined ? teams["Gabbar XI"].purse : 50000}
               playerCount={teams["Gabbar XI"]?.player_count}
+              isMyTeam={true}
             />
           </div>
           {/* Right - Thakur XI */}
@@ -196,9 +197,14 @@ export default function GabbarCaptainPage() {
           </div>
         </div>
       </div>
-      {/* Bottom Section - Remaining Players Static Grid */}
+      {/* Bottom Section - Remaining Players Dynamic Grid */}
       <div className="w-full flex justify-center pb-6 pt-4">
-        <RemainingPlayersCard players={players} activePlayerIndex={activePlayerIndex} />
+        {/* Only show remaining players grid, no bidding buttons */}
+        {(() => {
+          const unsoldPlayers = players.filter(p => !p.sold);
+          const activeUnsoldIndex = unsoldPlayers.findIndex(p => p.player_id === (players[activePlayerIndex]?.player_id));
+          return <RemainingPlayersCard players={players} activePlayerIndex={activeUnsoldIndex} />;
+        })()}
       </div>
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {

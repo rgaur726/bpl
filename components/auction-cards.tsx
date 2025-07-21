@@ -35,6 +35,7 @@ interface TeamCardProps {
   isAdmin?: boolean;
   onCaptainSelect?: (teamName: string, playerId: number, playerName: string) => void;
   currentCaptain?: { id: number; name: string } | null;
+  isMyTeam?: boolean; // New prop to indicate if this is the captain's own team
 }
 
 interface RemainingPlayersCardProps {
@@ -94,7 +95,7 @@ export function PlayerInfoCard({ activePlayer, lastBidder, children }: PlayerInf
   );
 }
 
-export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor, players, purse, playerCount, isAdmin = false, onCaptainSelect, currentCaptain }: TeamCardProps) {
+export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor, players, purse, playerCount, isAdmin = false, onCaptainSelect, currentCaptain, isMyTeam = false }: TeamCardProps) {
   // Get sold players for this team
   const soldPlayersForTeam = players.filter(p => p.sold && p.team === team);
   
@@ -135,7 +136,7 @@ export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor,
         <h3 className="text-white text-xl font-bold text-center mb-4 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
           <span className="inline-flex items-center justify-center gap-2">
             <img src={logoSrc} alt={`${team} Logo`} className="h-6 w-6 inline-block rounded-full border border-blue-400/50 mr-1" />
-            {team}
+            {isMyTeam ? `My Team (${team})` : team}
           </span>
         </h3>
         
@@ -207,29 +208,64 @@ export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor,
 export function RemainingPlayersCard({ players, activePlayerIndex }: RemainingPlayersCardProps) {
   // Only show unsold players, highlight active
   const unsoldPlayers = players.filter((p) => !p.sold);
-  // Fill up to 24 slots with empty Player objects
+  
+  // If no players remaining, show completion message
+  if (unsoldPlayers.length === 0) {
+    return (
+      <Card className="bg-transparent bg-gradient-to-r from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl w-[90vw]">
+        <CardContent className="p-8">
+          <div className="text-center">
+            <div className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent mb-2">
+              🎉 Auction Completed! 🎉
+            </div>
+            <div className="text-xl text-white font-semibold">
+              No Players Remaining
+            </div>
+            <div className="text-sm text-gray-300 mt-2">
+              All players have been successfully assigned to teams
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  // Calculate dynamic rows needed (8 players per row, but remove empty rows)
+  const playersPerRow = 8;
+  const rowsNeeded = Math.ceil(unsoldPlayers.length / playersPerRow);
+  
+  // Create grid with only the needed rows
   const gridPlayers = [...unsoldPlayers];
-  const emptyPlayer: Player = { id: undefined, Name: "", sold: false };
-  while (gridPlayers.length < 24) gridPlayers.push(emptyPlayer);
   
   return (
     <Card className="bg-transparent bg-gradient-to-r from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl w-[90vw]">
       <CardContent className="p-4">
-        <div className="grid grid-rows-3 gap-2">
-          {[0, 1, 2].map((row) => (
+        <div className="grid gap-2" style={{ gridTemplateRows: `repeat(${rowsNeeded}, minmax(0, 1fr))` }}>
+          {Array.from({ length: rowsNeeded }).map((_, row) => (
             <div key={row} className="grid grid-cols-8 gap-2">
-              {Array.from({ length: 8 }).map((_, col) => {
-                const idx = row * 8 + col;
+              {Array.from({ length: playersPerRow }).map((_, col) => {
+                const idx = row * playersPerRow + col;
                 const player = gridPlayers[idx];
                 const isActive = idx === activePlayerIndex;
+                
+                // If no player for this slot, show empty cell
+                if (!player) {
+                  return (
+                    <div
+                      key={`empty-${row}-${col}`}
+                      className="min-w-[90px] h-8"
+                    />
+                  );
+                }
+                
                 return (
                   <div
-                    key={player?.id || idx}
+                    key={player?.id || player?.player_id || `${row}-${col}`}
                     className={`bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-lg px-2 py-1 text-sm text-center flex flex-col items-center justify-center border border-white/10 min-w-[90px] h-8 ${
                       isActive ? 'text-yellow-400 font-bold ring-2 ring-yellow-400' : 'text-white'
                     }`}
                   >
-                    {player ? player.Name : ""}
+                    {player.Name || ""}
                   </div>
                 );
               })}

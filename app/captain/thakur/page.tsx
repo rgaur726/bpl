@@ -180,6 +180,7 @@ export default function ThakurCaptainPage() {
               players={players}
               purse={teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000}
               playerCount={teams["Thakur XI"]?.player_count}
+              isMyTeam={true}
             />
           </div>
           {/* Right - Gabbar XI */}

@@ -332,7 +332,6 @@ export default function AdminPage() {
               <div className="flex gap-3">
                 <Button
                   className="bg-gradient-to-r from-yellow-600 to-yellow-700 text-white flex-1 rounded-xl shadow-lg"
-                  disabled={!activePlayer || currentBid === 0}
                   onClick={async () => {
                     if (confirm('Reset the current bid to 0? This will clear the current bid and last bidder.')) {
                       try {
