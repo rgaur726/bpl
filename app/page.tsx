@@ -57,8 +57,23 @@ export default function HomePage() {
       )
       .subscribe();
 
+    // Subscribe to captain assignment broadcasts
+    const captainBroadcastSubscription = supabase
+      .channel('captain_updates')
+      .on('broadcast', { event: 'captain_assigned' }, async () => {
+        await fetchCaptains();
+      })
+      .subscribe();
+
+    // Fallback: polling every 5 seconds to ensure updates  
+    const pollInterval = setInterval(async () => {
+      await fetchCaptains();
+    }, 5000);
+
     return () => {
       teamSubscription.unsubscribe();
+      captainBroadcastSubscription.unsubscribe();
+      clearInterval(pollInterval);
     };
   }, []);
   return (

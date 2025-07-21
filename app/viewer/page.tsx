@@ -79,6 +79,10 @@ export default function ViewerPage() {
           console.log("Viewer page - Received bid_update broadcast:", payload);
           await fetchPlayersAndPurses();
         })
+        .on('broadcast', { event: 'captain_assigned' }, async (payload) => {
+          console.log("Viewer page - Received captain_assigned broadcast:", payload);
+          await fetchPlayersAndPurses();
+        })
         .subscribe();
 
       // Fallback: polling every 5 seconds

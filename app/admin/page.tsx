@@ -90,9 +90,19 @@ export default function AdminPage() {
       )
       .subscribe();
 
+    // Subscribe to captain assignment broadcasts
+    const captainBroadcastSubscription = supabase
+      .channel('captain_updates_admin')
+      .on('broadcast', { event: 'captain_assigned' }, async (payload) => {
+        console.log("Admin page - Received captain_assigned broadcast:", payload);
+        await fetchPlayersAndPurses();
+      })
+      .subscribe();
+
     return () => {
       supabase.removeChannel(playerSubscription);
       supabase.removeChannel(teamSubscription);
+      supabase.removeChannel(captainBroadcastSubscription);
     };
   }, []);
 

@@ -85,6 +85,10 @@ export default function ThakurCaptainPage() {
           console.log("Thakur page - Received bid_update broadcast:", payload);
           await fetchPlayersAndPurses();
         })
+        .on('broadcast', { event: 'captain_assigned' }, async (payload) => {
+          console.log("Thakur page - Received captain_assigned broadcast:", payload);
+          await fetchPlayersAndPurses();
+        })
         .subscribe();
 
       // Fallback: polling every 5 seconds

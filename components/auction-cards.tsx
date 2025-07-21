@@ -95,7 +95,17 @@ export function PlayerInfoCard({ activePlayer, lastBidder, children }: PlayerInf
 }
 
 export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor, players, purse, playerCount, isAdmin = false, onCaptainSelect, currentCaptain }: TeamCardProps) {
-  const teamPlayers = players.filter(p => p.sold && p.team === team);
+  // Get sold players for this team
+  const soldPlayersForTeam = players.filter(p => p.sold && p.team === team);
+  
+  // Separate captains from regular players
+  const captains = soldPlayersForTeam.filter(p => p.sold_amount === 0);
+  const regularPlayers = soldPlayersForTeam.filter(p => p.sold_amount !== 0);
+  
+  // For regular players, maintain their original order from the players array
+  // This ensures new players appear in the next available slot
+  const teamPlayers = [...captains, ...regularPlayers];
+    
   // Use the playerCount from props if provided, otherwise fall back to calculated count
   const displayPlayerCount = playerCount !== undefined ? playerCount : teamPlayers.length;
   

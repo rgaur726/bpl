@@ -105,6 +105,22 @@ export async function assignCaptain(teamName: string, playerId: number, playerNa
   if (playerError) {
     throw new Error(`Failed to update player data: ${playerError.message}`);
   }
+
+  // Broadcast captain assignment to all connected clients
+  const broadcastChannel = supabase.channel('captain_updates');
+  await broadcastChannel.send({
+    type: 'broadcast',
+    event: 'captain_assigned',
+    payload: { 
+      teamName, 
+      playerId, 
+      playerName,
+      timestamp: new Date().toISOString()
+    }
+  });
+  
+  // Ensure the broadcast is sent
+  await new Promise(resolve => setTimeout(resolve, 100));
 }
 
 export async function removeCaptain(teamName: string): Promise<void> {
