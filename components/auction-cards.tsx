@@ -97,7 +97,7 @@ export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor,
   
   // Always show 12 slots, fill with placeholders if needed
   const slots = [...teamPlayers];
-  while (slots.length < 12) slots.push({ id: undefined, Name: "-", sold_amount: undefined, sold: false });
+  while (slots.length < 12) slots.push({ id: undefined, Name: "", sold_amount: undefined, sold: false });
   return (
     <Card className={`bg-transparent bg-gradient-to-br from-${gradientFrom} to-${gradientTo} backdrop-blur-md border border-${borderColor} shadow-2xl h-[34rem] relative`}>
       <CardContent className="p-4 h-full">
@@ -108,16 +108,18 @@ export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor,
           </span>
         </h3>
         <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-3 mb-2 rounded-lg border border-white/10">
-          <div className="grid grid-cols-2 text-sm font-semibold text-white">
-            <span>Name</span>
-            <span>Price Sold</span>
+          <div className="grid text-sm font-semibold text-white" style={{ gridTemplateColumns: '12% 63% 25%' }}>
+            <span>#</span>
+            <span>Player Name</span>
+            <span>Price</span>
           </div>
         </div>
         <div className="space-y-1 h-80 overflow-y-auto custom-scrollbar">
           {slots.map((player, index) => (
-            <div key={player.id || index} className="bg-slate-700/30 backdrop-blur-sm p-2 grid grid-cols-2 text-sm text-white rounded-lg border border-white/5">
-              <span>{player.Name}</span>
-              <span>{player.sold_amount !== undefined ? `₹${player.sold_amount}` : '-'}</span>
+            <div key={player.id || index} className="bg-slate-700/30 backdrop-blur-sm p-2 grid text-sm text-white rounded-lg border border-white/5" style={{ gridTemplateColumns: '12% 63% 25%' }}>
+              <span className="text-slate-400">{index + 1}.</span>
+              <span className="truncate pr-2">{player.Name}</span>
+              <span>{player.sold_amount !== undefined ? `₹${player.sold_amount}` : ''}</span>
             </div>
           ))}
         </div>
