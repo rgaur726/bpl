@@ -36,6 +36,8 @@ interface TeamCardProps {
   onCaptainSelect?: (teamName: string, playerId: number, playerName: string) => void;
   currentCaptain?: { id: number; name: string } | null;
   isMyTeam?: boolean; // New prop to indicate if this is the captain's own team
+  captainPin?: string; // PIN for captain authentication
+  auctionStarted?: boolean; // New prop to control PIN display mode
 }
 
 interface RemainingPlayersCardProps {
@@ -43,6 +45,7 @@ interface RemainingPlayersCardProps {
   activePlayerIndex: number;
 }
 
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 
 export function PlayerInfoCard({ activePlayer, lastBidder, children }: PlayerInfoCardProps) {
@@ -95,7 +98,10 @@ export function PlayerInfoCard({ activePlayer, lastBidder, children }: PlayerInf
   );
 }
 
-export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor, players, purse, playerCount, isAdmin = false, onCaptainSelect, currentCaptain, isMyTeam = false }: TeamCardProps) {
+export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor, players, purse, playerCount, isAdmin = false, onCaptainSelect, currentCaptain, isMyTeam = false, captainPin, auctionStarted = false }: TeamCardProps) {
+  // State for dropdown PIN visibility
+  const [showPin, setShowPin] = useState(false);
+  
   // Get sold players for this team
   const soldPlayersForTeam = players.filter(p => p.sold && p.team === team);
   
@@ -133,12 +139,82 @@ export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor,
   return (
     <Card className={`bg-transparent bg-gradient-to-br from-${gradientFrom} to-${gradientTo} backdrop-blur-md border border-${borderColor} shadow-2xl h-[34rem] relative flex flex-col`}>
       <CardContent className="p-4 h-full flex flex-col">
-        <h3 className="text-white text-xl font-bold text-center mb-4 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-          <span className="inline-flex items-center justify-center gap-2">
-            <img src={logoSrc} alt={`${team} Logo`} className="h-6 w-6 inline-block rounded-full border border-blue-400/50 mr-1" />
-            {isMyTeam ? `My Team (${team})` : team}
-          </span>
-        </h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-white text-xl font-bold flex-1 text-center bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="inline-flex items-center gap-2">
+              <img src={logoSrc} alt={`${team} Logo`} className="h-6 w-6 inline-block rounded-full border border-blue-400/50 mr-1" />
+              {isMyTeam ? `My Team (${team})` : team}
+            </span>
+          </h3>
+          {/* PIN Dropdown - Only show in admin mode after auction started */}
+          {isAdmin && captainPin && auctionStarted && (
+            <div className="relative">
+              <button
+                onClick={() => setShowPin(!showPin)}
+                className="w-6 h-6 bg-indigo-500 hover:bg-indigo-600 text-white rounded-full text-xs font-bold transition-colors duration-200 flex items-center justify-center"
+                title="View Captain PIN"
+              >
+                📋
+              </button>
+              {showPin && (
+                <div className="absolute top-8 right-0 z-10 bg-gradient-to-r from-indigo-600/90 to-purple-600/90 border border-indigo-400/50 rounded-lg p-3 backdrop-blur-md shadow-lg min-w-[140px]">
+                  <div className="text-center">
+                    <div className="text-xs text-gray-200 mb-1">Captain PIN</div>
+                    <div className="text-sm font-bold text-white tracking-wider mb-2">{captainPin}</div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigator.clipboard.writeText(captainPin);
+                        const btn = e.target as HTMLButtonElement;
+                        const originalText = btn.textContent;
+                        btn.textContent = '✓';
+                        setTimeout(() => {
+                          btn.textContent = originalText;
+                        }, 1000);
+                        // Close the popup after copying
+                        setShowPin(false);
+                      }}
+                      className="bg-indigo-500 hover:bg-indigo-600 text-white px-2 py-1 rounded text-xs font-medium transition-colors duration-200"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Captain PIN - Only show in admin mode before auction starts */}
+        {isAdmin && captainPin && !auctionStarted && (
+          <div className="mb-4 flex-shrink-0">
+            <div className="bg-gradient-to-r from-indigo-600/30 to-purple-600/30 border border-indigo-400/30 rounded-lg p-2">
+              <div className="flex items-center justify-between">
+                <div className="text-center flex-1">
+                  <div className="text-xs text-gray-300 mb-1">Captain PIN</div>
+                  <div className="text-sm font-bold text-white tracking-wider">{captainPin}</div>
+                </div>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(captainPin);
+                    // Simple feedback - you could enhance this with a toast
+                    const btn = event?.target as HTMLButtonElement;
+                    const originalText = btn?.textContent;
+                    if (btn) {
+                      btn.textContent = '✓';
+                      setTimeout(() => {
+                        btn.textContent = originalText;
+                      }, 1000);
+                    }
+                  }}
+                  className="ml-3 bg-indigo-500 hover:bg-indigo-600 text-white px-2 py-1 rounded text-xs font-medium transition-colors duration-200"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Captain Selection Dropdown - Only show in admin mode and when no captain is selected */}
         {isAdmin && !currentCaptain && (

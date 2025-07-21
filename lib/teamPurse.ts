@@ -6,6 +6,7 @@ export interface TeamData {
   player_count: number;
   captain_player_id?: number;
   captain_name?: string;
+  captain_pin?: string;
 }
 
 export async function fetchTeamPurses(): Promise<Record<string, number>> {
@@ -19,7 +20,7 @@ export async function fetchTeamPurses(): Promise<Record<string, number>> {
 }
 
 export async function fetchTeamData(): Promise<Record<string, TeamData>> {
-  const { data, error } = await supabase.from("teams").select("team_name, purse, player_count, captain_player_id, captain_name");
+  const { data, error } = await supabase.from("teams").select("team_name, purse, player_count, captain_player_id, captain_name, captain_pin");
   if (error || !data) return {};
   const teamMap: Record<string, TeamData> = {};
   for (const team of data) {
@@ -28,7 +29,8 @@ export async function fetchTeamData(): Promise<Record<string, TeamData>> {
       purse: team.purse,
       player_count: team.player_count || 0,
       captain_player_id: team.captain_player_id,
-      captain_name: team.captain_name
+      captain_name: team.captain_name,
+      captain_pin: team.captain_pin
     };
   }
   return teamMap;
@@ -68,13 +70,17 @@ export async function resetTeamData(): Promise<void> {
       purse: 50000, 
       player_count: 0,
       captain_player_id: null,
-      captain_name: null
+      captain_name: null,
+      captain_pin: null
     })
     .in("team_name", ["Thakur XI", "Gabbar XI"]);
   
   if (error) {
     throw new Error(`Failed to reset team data: ${error.message}`);
   }
+  
+  // Generate new PINs for all teams
+  await generateTeamPins();
 }
 
 export async function assignCaptain(teamName: string, playerId: number, playerName: string): Promise<void> {
@@ -166,4 +172,49 @@ export async function removeCaptain(teamName: string): Promise<void> {
       throw new Error(`Failed to update player data: ${playerError.message}`);
     }
   }
+}
+
+// Generate a 6-digit PIN
+export function generatePin(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Generate and save PINs for all teams
+export async function generateTeamPins(): Promise<void> {
+  const { data: teams, error: fetchError } = await supabase
+    .from("teams")
+    .select("team_name");
+  
+  if (fetchError || !teams) {
+    throw new Error(`Failed to fetch teams: ${fetchError?.message}`);
+  }
+
+  // Generate different PINs for each team
+  const generatedPins = new Set<string>(); // To ensure uniqueness
+  
+  for (const team of teams) {
+    let pin: string;
+    
+    // Keep generating until we get a unique PIN
+    do {
+      pin = generatePin();
+    } while (generatedPins.has(pin));
+    
+    generatedPins.add(pin);
+    
+    console.log(`Generating PIN for ${team.team_name}: ${pin}`);
+    
+    const { error: updateError } = await supabase
+      .from("teams")
+      .update({ captain_pin: pin })
+      .eq("team_name", team.team_name);
+    
+    if (updateError) {
+      throw new Error(`Failed to update PIN for ${team.team_name}: ${updateError.message}`);
+    }
+    
+    console.log(`PIN successfully saved for ${team.team_name}`);
+  }
+  
+  console.log('All team PINs generated successfully');
 }

@@ -13,6 +13,7 @@ export default function AdminPage() {
   const [purses, setPurses] = useState<Record<string, number>>({});
   const [teams, setTeams] = useState<Record<string, any>>({});
   const [captains, setCaptains] = useState<Record<string, { id: number; name: string } | null>>({});
+  const [auctionStarted, setAuctionStarted] = useState(false);
   const { activePlayerIndex, setActivePlayerIndex, currentBid, lastBidder, loading } = useActivePlayerSync();
   const activePlayer = players[activePlayerIndex] || null;
 
@@ -115,6 +116,11 @@ export default function AdminPage() {
     const { fetchTeamPurses, fetchTeamData } = await import("@/lib/teamPurse");
     const purseMap = await fetchTeamPurses();
     const teamDataMap = await fetchTeamData();
+    console.log('Fetched team data:', teamDataMap);
+    console.log('Team PINs:', {
+      'Thakur XI': teamDataMap['Thakur XI']?.captain_pin,
+      'Gabbar XI': teamDataMap['Gabbar XI']?.captain_pin
+    });
     setPurses(purseMap);
     setTeams(teamDataMap);
   };
@@ -133,49 +139,72 @@ export default function AdminPage() {
           <h1 className="text-3xl font-bold text-white bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 bg-clip-text text-transparent">
             Admin Panel
           </h1>
-          <Button
-            className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-red-700 hover:to-red-800 shadow-lg"
-            onClick={async () => {
-              if (confirm('Are you sure you want to restart the auction? This will remove all players from teams and reset everything back to the beginning.')) {
-                try {
-                  const { resetTeamData } = await import("@/lib/teamPurse");
-                  await resetTeamData();
-                  // Reset all players
-                  const resetPlayersUpdate = await supabase
-                    .from("Players")
-                    .update({ sold: false, team: null, sold_amount: null })
-                    .neq("player_id", -1); // Update all players
-                  if (resetPlayersUpdate.error) {
-                    console.error('Players reset error:', resetPlayersUpdate.error);
-                    alert('Error resetting players: ' + resetPlayersUpdate.error.message);
-                    return;
+          <div className="flex gap-3">
+            {!auctionStarted && (
+              <Button
+                className="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-2 rounded-lg text-sm hover:from-green-700 hover:to-green-800 shadow-lg"
+                onClick={async () => {
+                  try {
+                    console.log('Starting auction and generating PINs...');
+                    const { generateTeamPins } = await import("@/lib/teamPurse");
+                    await generateTeamPins();
+                    console.log('PINs generated successfully');
+                    await refreshTeamData(); // Refresh to show the new PINs
+                    console.log('Team data refreshed');
+                    setAuctionStarted(true); // Hide the button and switch to dropdown mode
+                  } catch (error: any) {
+                    console.error('Start auction error:', error);
+                    alert('Error starting auction: ' + error.message);
                   }
-                  // Reset auction state
-                  const resetAuctionUpdate = await supabase
-                    .from("auction_state")
-                    .update({ active_player_index: -1, current_bid: 0, last_bidder: null })
-                    .eq("id", 1);
-                  if (resetAuctionUpdate.error) {
-                    console.error('Auction state reset error:', resetAuctionUpdate.error);
-                    alert('Error resetting auction state: ' + resetAuctionUpdate.error.message);
-                    return;
+                }}
+              >
+                Start Auction
+              </Button>
+            )}
+            <Button
+              className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-red-700 hover:to-red-800 shadow-lg"
+              onClick={async () => {
+                if (confirm('Are you sure you want to restart the auction? This will remove all players from teams and reset everything back to the beginning.')) {
+                  try {
+                    const { resetTeamData } = await import("@/lib/teamPurse");
+                    await resetTeamData();
+                    // Reset all players
+                    const resetPlayersUpdate = await supabase
+                      .from("Players")
+                      .update({ sold: false, team: null, sold_amount: null })
+                      .neq("player_id", -1); // Update all players
+                    if (resetPlayersUpdate.error) {
+                      console.error('Players reset error:', resetPlayersUpdate.error);
+                      alert('Error resetting players: ' + resetPlayersUpdate.error.message);
+                      return;
+                    }
+                    // Reset auction state
+                    const resetAuctionUpdate = await supabase
+                      .from("auction_state")
+                      .update({ active_player_index: -1, current_bid: 0, last_bidder: null })
+                      .eq("id", 1);
+                    if (resetAuctionUpdate.error) {
+                      console.error('Auction state reset error:', resetAuctionUpdate.error);
+                      alert('Error resetting auction state: ' + resetAuctionUpdate.error.message);
+                      return;
+                    }
+                    // Refresh all data
+                    await refreshPlayerData();
+                    await refreshTeamData();
+                    // Reset captain state
+                    setCaptains({});
+                    setActivePlayerIndex(-1);
+                    alert('Auction reset successfully! New PINs generated for team captains.');
+                  } catch (error: any) {
+                    console.error('Reset error:', error);
+                    alert('Error resetting auction: ' + error.message);
                   }
-                  // Refresh all data
-                  await refreshPlayerData();
-                  await refreshTeamData();
-                  // Reset captain state
-                  setCaptains({});
-                  setActivePlayerIndex(-1);
-                  alert('Auction reset successfully!');
-                } catch (error: any) {
-                  console.error('Reset error:', error);
-                  alert('Error resetting auction: ' + error.message);
                 }
-              }
-            }}
-          >
-            Reset Auction
-          </Button>
+              }}
+            >
+              Reset Auction
+            </Button>
+          </div>
         </div>
         {/* Main Content: Player Info, Thakur XI, Gabbar XI */}
         <div className="flex-1 grid grid-cols-12 gap-6">
@@ -279,7 +308,8 @@ export default function AdminPage() {
                 </Button>
                 <Button
                   className="bg-gradient-to-r from-blue-600 to-blue-700 text-white flex-1 rounded-xl shadow-lg"
-                  disabled={(currentBid > 0 && !!lastBidder) || players.filter(p => !p.sold).length === 0}
+                  disabled={(currentBid > 0 && !!lastBidder) || players.filter(p => !p.sold).length === 0 || !auctionStarted}
+                  title={!auctionStarted ? "Start the auction first before selecting next player" : ""}
                   onClick={async () => {
                     if (players.length === 0) return;
                     // Filter unsold players
@@ -332,6 +362,7 @@ export default function AdminPage() {
               <div className="flex gap-3">
                 <Button
                   className="bg-gradient-to-r from-yellow-600 to-yellow-700 text-white flex-1 rounded-xl shadow-lg"
+                  disabled={!activePlayer || currentBid === 0}
                   onClick={async () => {
                     if (confirm('Reset the current bid to 0? This will clear the current bid and last bidder.')) {
                       try {
@@ -373,6 +404,8 @@ export default function AdminPage() {
               isAdmin={true}
               onCaptainSelect={handleCaptainSelect}
               currentCaptain={captains["Thakur XI"]}
+              captainPin={teams["Thakur XI"]?.captain_pin}
+              auctionStarted={auctionStarted}
             />
           </div>
           {/* Right - Gabbar XI */}
@@ -389,6 +422,8 @@ export default function AdminPage() {
               isAdmin={true}
               onCaptainSelect={handleCaptainSelect}
               currentCaptain={captains["Gabbar XI"]}
+              captainPin={teams["Gabbar XI"]?.captain_pin}
+              auctionStarted={auctionStarted}
             />
           </div>
         </div>

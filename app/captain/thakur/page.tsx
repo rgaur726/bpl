@@ -6,14 +6,19 @@ import { useActivePlayerSync } from "@/hooks/useActivePlayer";
 import { Button } from "@/components/ui/button";
 import { PlayerInfoCard, TeamCard, RemainingPlayersCard } from "@/components/auction-cards";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { Home, Crown } from "lucide-react";
+import { Home, Crown, Lock, Eye, EyeOff } from "lucide-react";
 
 export default function ThakurCaptainPage() {
   const [players, setPlayers] = useState<any[]>([]);
   const [purses, setPurses] = useState<Record<string, number>>({});
   const [teams, setTeams] = useState<Record<string, any>>({});
   const [captainName, setCaptainName] = useState<string>("Thakur XI Captain");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [pin, setPin] = useState("");
+  const [showPin, setShowPin] = useState(false);
+  const [pinError, setPinError] = useState("");
   const { activePlayerIndex, currentBid, setCurrentBid, lastBidder, loading } = useActivePlayerSync();
   const activePlayer = players[activePlayerIndex] || null;
 
@@ -34,6 +39,32 @@ export default function ThakurCaptainPage() {
       setCaptainName(thakurTeam.captain_name);
     } else {
       setCaptainName("Thakur XI Captain");
+    }
+  };
+
+  const handlePinSubmit = async () => {
+    try {
+      const { supabase } = await import("@/lib/supabaseClient");
+      const { data: teamData, error } = await supabase
+        .from("teams")
+        .select("captain_pin")
+        .eq("team_name", "Thakur XI")
+        .single();
+      
+      if (error) {
+        setPinError("Error verifying PIN. Please try again.");
+        return;
+      }
+      
+      if (teamData?.captain_pin === pin) {
+        setIsAuthenticated(true);
+        setPinError("");
+        setPin("");
+      } else {
+        setPinError("Invalid PIN. Please check with admin and try again.");
+      }
+    } catch (error) {
+      setPinError("Error verifying PIN. Please try again.");
     }
   };
 
@@ -117,7 +148,75 @@ export default function ThakurCaptainPage() {
   // No loading screen; render main UI immediately
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-8 relative">
+      {/* Login Popup Overlay */}
+      {!isAuthenticated && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-md border border-blue-400/30 rounded-2xl p-8 w-full max-w-md shadow-2xl">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Lock className="h-8 w-8 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-2">
+                Captain Authentication
+              </h2>
+              <p className="text-gray-300 text-sm">
+                Enter your PIN to access the Thakur XI auction panel
+              </p>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="relative">
+                <Input
+                  type={showPin ? "text" : "password"}
+                  placeholder="Enter your PIN"
+                  value={pin}
+                  onChange={(e) => {
+                    setPin(e.target.value);
+                    setPinError("");
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handlePinSubmit();
+                    }
+                  }}
+                  className="bg-slate-700/50 border-blue-400/30 text-white placeholder:text-gray-400 rounded-xl pr-12 py-3 text-center text-lg font-mono tracking-wider"
+                  maxLength={6}
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPin(!showPin)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                >
+                  {showPin ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              
+              {pinError && (
+                <div className="text-red-400 text-sm text-center bg-red-500/10 border border-red-400/20 rounded-lg p-2">
+                  {pinError}
+                </div>
+              )}
+              
+              <Button
+                onClick={handlePinSubmit}
+                disabled={pin.length === 0}
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 rounded-xl font-semibold shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Enter Auction
+              </Button>
+            </div>
+            
+            <div className="mt-6 text-center">
+              <p className="text-xs text-gray-400">
+                Contact the admin if you don't have your PIN
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto h-full flex flex-col">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
