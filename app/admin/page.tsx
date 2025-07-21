@@ -14,6 +14,8 @@ export default function AdminPage() {
   const [teams, setTeams] = useState<Record<string, any>>({});
   const [captains, setCaptains] = useState<Record<string, { id: number; name: string } | null>>({});
   const [auctionStarted, setAuctionStarted] = useState(false);
+  const [showThakurPin, setShowThakurPin] = useState(false);
+  const [showGabbarPin, setShowGabbarPin] = useState(false);
   const { activePlayerIndex, setActivePlayerIndex, currentBid, lastBidder, loading } = useActivePlayerSync();
   const activePlayer = players[activePlayerIndex] || null;
 
@@ -59,6 +61,15 @@ export default function AdminPage() {
     } catch (error: any) {
       console.error('Error assigning captain:', error);
       alert('Error assigning captain: ' + error.message);
+    }
+  };
+
+  const handlePinCopied = (teamName: string) => {
+    // Hide the PIN popup for the specific team after copying
+    if (teamName === "Thakur XI") {
+      setShowThakurPin(false);
+    } else if (teamName === "Gabbar XI") {
+      setShowGabbarPin(false);
     }
   };
 
@@ -194,7 +205,9 @@ export default function AdminPage() {
                     // Reset captain state
                     setCaptains({});
                     setActivePlayerIndex(-1);
-                    alert('Auction reset successfully! New PINs generated for team captains.');
+                    // Show PINs for both teams automatically
+                    setShowThakurPin(true);
+                    setShowGabbarPin(true);
                   } catch (error: any) {
                     console.error('Reset error:', error);
                     alert('Error resetting auction: ' + error.message);
@@ -406,6 +419,8 @@ export default function AdminPage() {
               currentCaptain={captains["Thakur XI"]}
               captainPin={teams["Thakur XI"]?.captain_pin}
               auctionStarted={auctionStarted}
+              forceShowPin={showThakurPin}
+              onPinCopied={() => handlePinCopied("Thakur XI")}
             />
           </div>
           {/* Right - Gabbar XI */}
@@ -424,6 +439,8 @@ export default function AdminPage() {
               currentCaptain={captains["Gabbar XI"]}
               captainPin={teams["Gabbar XI"]?.captain_pin}
               auctionStarted={auctionStarted}
+              forceShowPin={showGabbarPin}
+              onPinCopied={() => handlePinCopied("Gabbar XI")}
             />
           </div>
         </div>

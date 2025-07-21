@@ -38,6 +38,8 @@ interface TeamCardProps {
   isMyTeam?: boolean; // New prop to indicate if this is the captain's own team
   captainPin?: string; // PIN for captain authentication
   auctionStarted?: boolean; // New prop to control PIN display mode
+  forceShowPin?: boolean; // New prop to force PIN dropdown open
+  onPinCopied?: (teamName: string) => void; // Callback when PIN is copied
 }
 
 interface RemainingPlayersCardProps {
@@ -98,9 +100,14 @@ export function PlayerInfoCard({ activePlayer, lastBidder, children }: PlayerInf
   );
 }
 
-export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor, players, purse, playerCount, isAdmin = false, onCaptainSelect, currentCaptain, isMyTeam = false, captainPin, auctionStarted = false }: TeamCardProps) {
-  // State for dropdown PIN visibility
-  const [showPin, setShowPin] = useState(false);
+export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor, players, purse, playerCount, isAdmin = false, onCaptainSelect, currentCaptain, isMyTeam = false, captainPin, auctionStarted = false, forceShowPin = false, onPinCopied }: TeamCardProps) {
+  // State for dropdown PIN visibility - controlled by forceShowPin prop
+  const [showPin, setShowPin] = useState(forceShowPin);
+  
+  // Update showPin when forceShowPin changes
+  React.useEffect(() => {
+    setShowPin(forceShowPin);
+  }, [forceShowPin]);
   
   // Get sold players for this team
   const soldPlayersForTeam = players.filter(p => p.sold && p.team === team);
@@ -146,8 +153,8 @@ export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor,
               {isMyTeam ? `My Team (${team})` : team}
             </span>
           </h3>
-          {/* PIN Dropdown - Only show in admin mode after auction started */}
-          {isAdmin && captainPin && auctionStarted && (
+          {/* PIN Dropdown - Only show in admin mode when PIN exists */}
+          {isAdmin && captainPin && (
             <div className="relative">
               <button
                 onClick={() => setShowPin(!showPin)}
@@ -173,6 +180,10 @@ export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor,
                         }, 1000);
                         // Close the popup after copying
                         setShowPin(false);
+                        // Notify parent component that PIN was copied
+                        if (onPinCopied) {
+                          onPinCopied(team);
+                        }
                       }}
                       className="bg-indigo-500 hover:bg-indigo-600 text-white px-2 py-1 rounded text-xs font-medium transition-colors duration-200"
                     >
@@ -185,37 +196,6 @@ export function TeamCard({ team, logoSrc, gradientFrom, gradientTo, borderColor,
           )}
         </div>
 
-        {/* Captain PIN - Only show in admin mode before auction starts */}
-        {isAdmin && captainPin && !auctionStarted && (
-          <div className="mb-4 flex-shrink-0">
-            <div className="bg-gradient-to-r from-indigo-600/30 to-purple-600/30 border border-indigo-400/30 rounded-lg p-2">
-              <div className="flex items-center justify-between">
-                <div className="text-center flex-1">
-                  <div className="text-xs text-gray-300 mb-1">Captain PIN</div>
-                  <div className="text-sm font-bold text-white tracking-wider">{captainPin}</div>
-                </div>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(captainPin);
-                    // Simple feedback - you could enhance this with a toast
-                    const btn = event?.target as HTMLButtonElement;
-                    const originalText = btn?.textContent;
-                    if (btn) {
-                      btn.textContent = '✓';
-                      setTimeout(() => {
-                        btn.textContent = originalText;
-                      }, 1000);
-                    }
-                  }}
-                  className="ml-3 bg-indigo-500 hover:bg-indigo-600 text-white px-2 py-1 rounded text-xs font-medium transition-colors duration-200"
-                >
-                  Copy
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-        
         {/* Captain Selection Dropdown - Only show in admin mode and when no captain is selected */}
         {isAdmin && !currentCaptain && (
           <div className="mb-4 flex-shrink-0">
