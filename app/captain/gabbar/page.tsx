@@ -198,30 +198,7 @@ export default function GabbarCaptainPage() {
       </div>
       {/* Bottom Section - Remaining Players Static Grid */}
       <div className="w-full flex justify-center pb-6 pt-4">
-        <Card className="bg-transparent bg-gradient-to-r from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/20 shadow-2xl w-[90vw]">
-          <CardContent className="p-4">
-            <div className="grid grid-rows-3 gap-2">
-              {[0, 1, 2].map(row => (
-                <div key={row} className="grid grid-cols-8 gap-2">
-                  {Array.from({ length: 8 }).map((_, col) => {
-                    const idx = row * 8 + col;
-                    const player = players[idx];
-                    const isActive = idx === activePlayerIndex;
-                    const isSold = player && player.sold;
-                    return (
-                      <div
-                        key={player?.id || idx}
-                        className={`bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-lg px-2 py-1 text-sm text-center flex flex-col items-center justify-center border border-white/10 min-w-[90px] h-8 ${isActive ? 'text-yellow-400 font-bold ring-2 ring-yellow-400' : 'text-white'} ${isSold ? 'opacity-40' : ''}`}
-                      >
-                        {isSold || !player ? '' : player.Name}
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <RemainingPlayersCard players={players} activePlayerIndex={activePlayerIndex} />
       </div>
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
