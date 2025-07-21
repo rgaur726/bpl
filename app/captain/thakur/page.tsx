@@ -13,6 +13,7 @@ export default function ThakurCaptainPage() {
   const [players, setPlayers] = useState<any[]>([]);
   const [purses, setPurses] = useState<Record<string, number>>({});
   const [teams, setTeams] = useState<Record<string, any>>({});
+  const [captainName, setCaptainName] = useState<string>("Thakur XI Captain");
   const { activePlayerIndex, currentBid, setCurrentBid, lastBidder, loading } = useActivePlayerSync();
   const activePlayer = players[activePlayerIndex] || null;
 
@@ -26,6 +27,14 @@ export default function ThakurCaptainPage() {
     const teamDataMap = await fetchTeamData();
     setPurses(purseMap);
     setTeams(teamDataMap);
+    
+    // Update captain name
+    const thakurTeam = teamDataMap["Thakur XI"];
+    if (thakurTeam?.captain_name) {
+      setCaptainName(thakurTeam.captain_name);
+    } else {
+      setCaptainName("Thakur XI Captain");
+    }
   };
 
   useEffect(() => {
@@ -117,7 +126,7 @@ export default function ThakurCaptainPage() {
           <div className="flex items-center space-x-3 text-white">
             <Crown className="h-6 w-6 text-blue-400" />
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-              Thakur XI Captain
+              {captainName}
             </h1>
           </div>
         </div>

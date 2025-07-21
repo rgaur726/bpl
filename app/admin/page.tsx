@@ -12,6 +12,7 @@ export default function AdminPage() {
   const [players, setPlayers] = useState<any[]>([])
   const [purses, setPurses] = useState<Record<string, number>>({});
   const [teams, setTeams] = useState<Record<string, any>>({});
+  const [captains, setCaptains] = useState<Record<string, { id: number; name: string } | null>>({});
   const { activePlayerIndex, setActivePlayerIndex, currentBid, lastBidder, loading } = useActivePlayerSync();
   const activePlayer = players[activePlayerIndex] || null;
 
@@ -23,6 +24,41 @@ export default function AdminPage() {
     const teamDataMap = await fetchTeamData();
     setPurses(purseMap);
     setTeams(teamDataMap);
+    
+    // Extract captain information from team data
+    const captainMap: Record<string, { id: number; name: string } | null> = {};
+    Object.entries(teamDataMap).forEach(([teamName, teamData]: [string, any]) => {
+      if (teamData.captain_player_id && teamData.captain_name) {
+        captainMap[teamName] = {
+          id: teamData.captain_player_id,
+          name: teamData.captain_name
+        };
+      } else {
+        captainMap[teamName] = null;
+      }
+    });
+    setCaptains(captainMap);
+  };
+
+  const handleCaptainSelect = async (teamName: string, playerId: number, playerName: string) => {
+    try {
+      const { assignCaptain } = await import("@/lib/teamPurse");
+      await assignCaptain(teamName, playerId, playerName);
+      
+      // Update local state
+      setCaptains(prev => ({
+        ...prev,
+        [teamName]: { id: playerId, name: playerName }
+      }));
+      
+      // Refresh data to ensure consistency
+      await fetchPlayersAndPurses();
+      
+      alert(`${playerName} has been assigned as captain of ${teamName}!`);
+    } catch (error: any) {
+      console.error('Error assigning captain:', error);
+      alert('Error assigning captain: ' + error.message);
+    }
   };
 
   useEffect(() => {
@@ -117,6 +153,8 @@ export default function AdminPage() {
                   // Refresh all data
                   await refreshPlayerData();
                   await refreshTeamData();
+                  // Reset captain state
+                  setCaptains({});
                   setActivePlayerIndex(-1);
                   alert('Auction reset successfully!');
                 } catch (error: any) {
@@ -323,6 +361,9 @@ export default function AdminPage() {
               players={players}
               purse={teams["Thakur XI"]?.purse !== undefined ? teams["Thakur XI"].purse : 50000}
               playerCount={teams["Thakur XI"]?.player_count}
+              isAdmin={true}
+              onCaptainSelect={handleCaptainSelect}
+              currentCaptain={captains["Thakur XI"]}
             />
           </div>
           {/* Right - Gabbar XI */}
@@ -336,6 +377,9 @@ export default function AdminPage() {
               players={players}
               purse={teams["Gabbar XI"]?.purse !== undefined ? teams["Gabbar XI"].purse : 50000}
               playerCount={teams["Gabbar XI"]?.player_count}
+              isAdmin={true}
+              onCaptainSelect={handleCaptainSelect}
+              currentCaptain={captains["Gabbar XI"]}
             />
           </div>
         </div>

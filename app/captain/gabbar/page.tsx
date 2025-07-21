@@ -13,6 +13,7 @@ export default function GabbarCaptainPage() {
   const [players, setPlayers] = useState<any[]>([]);
   const [purses, setPurses] = useState<Record<string, number>>({});
   const [teams, setTeams] = useState<Record<string, any>>({});
+  const [captainName, setCaptainName] = useState<string>("Gabbar XI Captain");
   const { activePlayerIndex, currentBid, setCurrentBid, lastBidder, loading } = useActivePlayerSync();
   // useActivePlayerSync already subscribes to changes, so currentBid and lastBidder will update automatically
   const activePlayer = players[activePlayerIndex] || null;
@@ -27,6 +28,14 @@ export default function GabbarCaptainPage() {
     const teamDataMap = await fetchTeamData();
     setPurses(purseMap);
     setTeams(teamDataMap);
+    
+    // Update captain name
+    const gabbarTeam = teamDataMap["Gabbar XI"];
+    if (gabbarTeam?.captain_name) {
+      setCaptainName(gabbarTeam.captain_name);
+    } else {
+      setCaptainName("Gabbar XI Captain");
+    }
   };
 
   useEffect(() => {
@@ -116,7 +125,7 @@ export default function GabbarCaptainPage() {
           <div className="flex items-center space-x-3 text-white">
             <Crown className="h-6 w-6 text-red-400" />
             <h1 className="text-2xl font-bold bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
-              Gabbar XI Captain
+              {captainName}
             </h1>
           </div>
         </div>

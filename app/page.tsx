@@ -5,8 +5,62 @@ import { Card, CardContent } from "@/components/ui/card";
 import { BPLLogo } from "@/components/bpl-logo";
 import Link from "next/link";
 import { Calendar, MapPin, Shield, Crown, Home as HomeIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function HomePage() {
+  const [captains, setCaptains] = useState<Record<string, string>>({
+    "Thakur XI": "Captain Thakur",
+    "Gabbar XI": "Captain Gabbar"
+  });
+
+  const fetchCaptains = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("teams")
+        .select("team_name, captain_name")
+        .in("team_name", ["Thakur XI", "Gabbar XI"]);
+      
+      if (error) {
+        console.error("Error fetching captains:", error);
+        return;
+      }
+
+      const captainMap: Record<string, string> = {};
+      data?.forEach((team) => {
+        if (team.captain_name) {
+          captainMap[team.team_name] = team.captain_name;
+        } else {
+          // Fallback to default names if no captain assigned
+          captainMap[team.team_name] = team.team_name === "Thakur XI" ? "Captain Thakur" : "Captain Gabbar";
+        }
+      });
+      
+      setCaptains(captainMap);
+    } catch (error) {
+      console.error("Error fetching captains:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCaptains();
+
+    // Subscribe to team changes for real-time captain updates
+    const teamSubscription = supabase
+      .channel("teams_channel_home")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "teams" },
+        async () => {
+          await fetchCaptains();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      teamSubscription.unsubscribe();
+    };
+  }, []);
   return (
     <div className="h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
       {/* Animated background elements */}
@@ -47,7 +101,7 @@ export default function HomePage() {
                 <h2 className="text-3xl font-bold text-white mb-2">Thakur XI</h2>
                 <div className="flex items-center justify-center space-x-2 mb-6">
                   <Crown className="h-4 w-4 text-blue-400" />
-                  <span className="text-white/80">Captain Thakur</span>
+                  <span className="text-white/80">{captains["Thakur XI"]}</span>
                 </div>
                 <Link href="/captain/thakur">
                   <Button className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 hover:from-blue-500/30 hover:to-cyan-500/30 text-white border border-blue-400/30 hover:border-blue-400/50 px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 backdrop-blur-sm">
@@ -106,7 +160,7 @@ export default function HomePage() {
                 <h2 className="text-3xl font-bold text-white mb-2">Gabbar XI</h2>
                 <div className="flex items-center justify-center space-x-2 mb-6">
                   <Crown className="h-4 w-4 text-red-400" />
-                  <span className="text-white/80">Captain Gabbar</span>
+                  <span className="text-white/80">{captains["Gabbar XI"]}</span>
                 </div>
                 <Link href="/captain/gabbar">
                   <Button className="bg-gradient-to-r from-red-500/20 to-orange-500/20 hover:from-red-500/30 hover:to-orange-500/30 text-white border border-red-400/30 hover:border-red-400/50 px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 backdrop-blur-sm">
