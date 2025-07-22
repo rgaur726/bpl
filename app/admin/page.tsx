@@ -43,12 +43,18 @@ export default function AdminPage() {
     setCaptains(captainMap);
     
     // Auto-detect if auction has started based on database state
-    // Check if any captains are assigned OR any players are sold OR there's an active player
-    const hasCaptains = Object.values(captainMap).some(captain => captain !== null);
+    // Check if any players are sold OR there's an active player (actual auction activity)
     const hasSoldPlayers = (data || []).some((player: any) => player.sold);
     const hasActivePlayer = activePlayerIndex >= 0;
     
-    if (hasCaptains || hasSoldPlayers || hasActivePlayer) {
+    // Check if both captains are assigned
+    const bothCaptainsAssigned = captainMap["Thakur XI"] !== null && 
+                                captainMap["Thakur XI"] !== undefined && 
+                                captainMap["Gabbar XI"] !== null && 
+                                captainMap["Gabbar XI"] !== undefined;
+    
+    // Only auto-set auction started if there's actual auction activity (sold players or active player)
+    if (hasSoldPlayers || hasActivePlayer) {
       setAuctionStarted(true);
     }
   };
@@ -161,10 +167,18 @@ export default function AdminPage() {
             Admin Panel
           </h1>
           <div className="flex gap-3">
+            {/* Always show Start Auction button when auction hasn't started, but disable if captains not selected */}
             {!auctionStarted && (
               <Button
-                className="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-2 rounded-lg text-sm hover:from-green-700 hover:to-green-800 shadow-lg"
+                className={`text-white px-4 py-2 rounded-lg text-sm shadow-lg transition-all duration-200 ${
+                  captains["Thakur XI"] && captains["Gabbar XI"] 
+                    ? "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800" 
+                    : "bg-gradient-to-r from-gray-500 to-gray-600 cursor-not-allowed opacity-60"
+                }`}
+                disabled={!captains["Thakur XI"] || !captains["Gabbar XI"]}
+                title={(!captains["Thakur XI"] || !captains["Gabbar XI"]) ? "Please select captains for both teams first" : "Start the auction"}
                 onClick={async () => {
+                  if (!captains["Thakur XI"] || !captains["Gabbar XI"]) return;
                   try {
                     console.log('Starting auction and generating PINs...');
                     const { generateTeamPins } = await import("@/lib/teamPurse");
@@ -181,6 +195,23 @@ export default function AdminPage() {
               >
                 Start Auction
               </Button>
+            )}
+            {/* Show helper text based on captain selection status */}
+            {!auctionStarted && (
+              <div className={`px-4 py-2 rounded-lg text-sm backdrop-blur-md border transition-all duration-200 ${
+                !captains["Thakur XI"] && !captains["Gabbar XI"] 
+                  ? "bg-gradient-to-r from-red-600/20 to-red-700/20 border-red-500/30 text-red-200"
+                  : (!captains["Thakur XI"] || !captains["Gabbar XI"]) 
+                    ? "bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border-yellow-500/30 text-yellow-200"
+                    : "bg-gradient-to-r from-green-600/20 to-green-700/20 border-green-500/30 text-green-200"
+              }`}>
+                {!captains["Thakur XI"] && !captains["Gabbar XI"] 
+                  ? "Select captains for both teams"
+                  : (!captains["Thakur XI"] || !captains["Gabbar XI"]) 
+                    ? `${!captains["Thakur XI"] ? "Thakur XI" : "Gabbar XI"} captain needed`
+                    : "Ready to start auction!"
+                }
+              </div>
             )}
             <Button
               className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-red-700 hover:to-red-800 shadow-lg"
@@ -333,8 +364,8 @@ export default function AdminPage() {
                 </Button>
                 <Button
                   className="bg-gradient-to-r from-blue-600 to-blue-700 text-white flex-1 rounded-xl shadow-lg"
-                  disabled={(currentBid > 0 && !!lastBidder) || players.filter(p => !p.sold).length === 0 || !auctionStarted}
-                  title={!auctionStarted ? "Start the auction first before selecting next player" : ""}
+                  disabled={(currentBid > 0 && !!lastBidder) || players.filter(p => !p.sold).length === 0 || !auctionStarted || !captains["Thakur XI"] || !captains["Gabbar XI"]}
+                  title={!auctionStarted ? "Start the auction first before selecting next player" : (!captains["Thakur XI"] || !captains["Gabbar XI"]) ? "Both team captains must be selected before starting player selection" : ""}
                   onClick={async () => {
                     if (players.length === 0) return;
                     // Filter unsold players
